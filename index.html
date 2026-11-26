@@ -1178,25 +1178,99 @@
 
   <!-- Firebase 雲端資料庫連線（支援班級名單與學生學習紀錄跨裝置同步） -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    const CUSTOM_FB_STORAGE_KEY = "stationery_detective_custom_fb_config_v1";
+    const DEFAULT_BUILTIN_FB_CONFIG = {
+      apiKey: "AIzaSyAWlpwBUE8FixscZxTGcVAC0t6998uj1Ik",
+      authDomain: "english-practice115.firebaseapp.com",
+      projectId: "english-practice115",
+      storageBucket: "english-practice115.firebasestorage.app",
+      messagingSenderId: "148682840529",
+      appId: "1:148682840529:web:93ddc39b9f185d87a968f0"
+    };
+
     window.CloudSync = {
       ready: false,
+      statusText: "🟡 僅限單機儲存（尚未綁定雲端資料庫，手機與電腦資料不會互通）",
       db: null,
       auth: null,
       user: null,
-      appId: typeof __app_id !== "undefined" ? __app_id : "stationery-detective-default",
-      init: async function () {
+      appId: typeof __app_id !== "undefined" ? __app_id : "stationery-detective-git-v1",
+      getSavedCustomConfig: function () {
         try {
-          if (typeof __firebase_config === "undefined" || !__firebase_config) return;
-          const firebaseConfig = JSON.parse(__firebase_config);
+          const raw = localStorage.getItem(CUSTOM_FB_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+          return null;
+        }
+      },
+      saveCustomConfigAndConnect: async function (rawInputText) {
+        try {
+          // 允許老師直接貼上整段 const firebaseConfig = { ... }; 或純 JSON
+          let cleaned = (rawInputText || "").trim();
+          const objMatch = cleaned.match(/\{[\s\S]*\}/);
+          if (!objMatch) {
+            return { ok: false, msg: "⚠️ 找不到有效的 { ... } 設定內容，請完整複製 Firebase 設定碼！" };
+          }
+          // 將 JS 物件鍵值轉為合法 JSON（例如 apiKey: "..." -> "apiKey": "..."）
+          let jsonStr = objMatch[0]
+            .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+            .replace(/'/g, '"')
+            .replace(/,\s*}/g, '}');
+
+          const parsed = JSON.parse(jsonStr);
+          if (!parsed.apiKey || !parsed.projectId) {
+            return { ok: false, msg: "⚠️ 設定檔缺少 apiKey 或 projectId，請確認是否複製完整！" };
+          }
+          localStorage.setItem(CUSTOM_FB_STORAGE_KEY, JSON.stringify(parsed));
+          await this.init(parsed);
+          return { ok: true, msg: "✅ 雲端資料庫設定已儲存並嘗試連線！" };
+        } catch (e) {
+          return { ok: false, msg: "❌ 格式解析失敗，請確認貼上的 Firebase 設定碼是否正確。" };
+        }
+      },
+      clearCustomConfig: function () {
+        try {
+          localStorage.removeItem(CUSTOM_FB_STORAGE_KEY);
+        } catch (e) {}
+        this.ready = false;
+        this.statusText = "🟡 僅限單機儲存（已清除自訂雲端設定）";
+      },
+      init: async function (overrideConfig = null) {
+        try {
+          let firebaseConfig = overrideConfig;
+          if (!firebaseConfig && typeof __firebase_config !== "undefined" && __firebase_config) {
+            firebaseConfig = JSON.parse(__firebase_config);
+          }
+          if (!firebaseConfig) {
+            firebaseConfig = this.getSavedCustomConfig();
+          }
+          if (!firebaseConfig && typeof DEFAULT_BUILTIN_FB_CONFIG !== "undefined") {
+            firebaseConfig = DEFAULT_BUILTIN_FB_CONFIG;
+          }
+          if (!firebaseConfig) {
+            this.ready = false;
+            this.statusText = "🟡 僅限單機儲存（上傳至 GitHub 後，請至「3. 雲端同步與密碼設定」貼上 Firebase 設定即可跨手機同步）";
+            if (state.showTeacherModal) renderTeacherModal();
+            return;
+          }
+
+          // 若已有舊的 Firebase App 實例先清除再重建
+          const existingApps = getApps();
+          for (const oldApp of existingApps) {
+            await deleteApp(oldApp);
+          }
+
           const app = initializeApp(firebaseConfig);
           this.auth = getAuth(app);
           this.db = getFirestore(app);
+          this.statusText = "⏳ 正在連線至雲端資料庫...";
+          if (state.showTeacherModal) renderTeacherModal();
 
-          if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
+          if (typeof __initial_auth_token !== "undefined" && __initial_auth_token && !overrideConfig) {
             await signInWithCustomToken(this.auth, __initial_auth_token);
           } else {
             await signInAnonymously(this.auth);
@@ -1206,11 +1280,16 @@
             this.user = user;
             if (user) {
               this.ready = true;
+              this.statusText = `🟢 雲端資料庫已連線（專案：${firebaseConfig.projectId || "已啟用"}，手機與電腦即時同步中！）`;
               this.subscribeAll();
+              if (state.showTeacherModal) renderTeacherModal();
             }
           });
         } catch (e) {
           console.warn("CloudSync fallback to localStorage:", e);
+          this.ready = false;
+          this.statusText = `🔴 雲端連線失敗（請確認 Firebase 已開啟「匿名登入」與「Firestore 資料庫」）：${e.message}`;
+          if (state.showTeacherModal) renderTeacherModal();
         }
       },
       subscribeAll: function () {
@@ -1252,9 +1331,10 @@
         }, (err) => console.warn(err));
       },
       saveTeacherSettings: async function (pin, strictRoster) {
-        if (!this.ready || !this.user || !this.db) return;
+        if (!this.ready || !this.user || !this.db) return false;
         const settingsRef = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "teacherConfig");
         await setDoc(settingsRef, { pin, strictRoster, updatedAt: Date.now() }, { merge: true });
+        return true;
       },
       upsertStudentRoster: async function (code, name) {
         if (!this.ready || !this.user || !this.db) return;
@@ -2772,6 +2852,20 @@
       const params = new URLSearchParams(window.location.search);
       const expParam = params.get("exp");
       const tokenParam = params.get("tid");
+      const fbParam = params.get("fb");
+
+      // 若 QR Code 網址中帶有雲端資料庫設定參數，學生手機掃描時自動綁定雲端！
+      if (fbParam) {
+        try {
+          const decodedFb = JSON.parse(atob(fbParam));
+          if (decodedFb && decodedFb.apiKey && decodedFb.projectId) {
+            localStorage.setItem("stationery_detective_custom_fb_config_v1", JSON.stringify(decodedFb));
+            if (window.CloudSync) {
+              window.CloudSync.init(decodedFb);
+            }
+          }
+        } catch (e) {}
+      }
 
       // 預設填入目前頁面乾淨網址（去除舊查詢參數）
       const cleanUrl = window.location.origin && window.location.origin !== "null"
@@ -2938,6 +3032,11 @@
         } else {
           urlObj.searchParams.delete("tid");
         }
+        // 自動將老師設定的 Firebase 雲端連線資訊編碼進 QR Code，學生手機掃描就能自動連線回傳成績！
+        const savedFb = window.CloudSync ? window.CloudSync.getSavedCustomConfig() : null;
+        if (savedFb && savedFb.apiKey && savedFb.projectId) {
+          urlObj.searchParams.set("fb", btoa(JSON.stringify(savedFb)));
+        }
         state.teacherGeneratedUrl = urlObj.toString();
       } catch (e) {
         state.teacherGeneratedUrl = "";
@@ -3047,11 +3146,38 @@
       playTone("correct");
       state.teacherPin = newPin;
       state.strictRosterOnly = strictVal;
-      state.rosterNoticeMsg = "✅ 已儲存教師密碼與名單驗證設定！";
       saveTeacherLocalBackup();
-      if (window.CloudSync) {
-        await window.CloudSync.saveTeacherSettings(newPin, strictVal);
+      let cloudSaved = false;
+      if (window.CloudSync && window.CloudSync.ready) {
+        cloudSaved = await window.CloudSync.saveTeacherSettings(newPin, strictVal);
       }
+      state.rosterNoticeMsg = cloudSaved
+        ? "✅ 已儲存教師密碼與設定（已同步至雲端資料庫）！"
+        : "✅ 已儲存至本機瀏覽器（⚠️ 提醒：尚未綁定雲端資料庫，換裝置或清除快取會恢復預設）";
+      renderTeacherModal();
+    }
+
+    async function saveCustomFirebaseConfigFromUI() {
+      const box = document.getElementById("teacherFirebaseConfigInput");
+      if (!box || !window.CloudSync) return;
+      const res = await window.CloudSync.saveCustomConfigAndConnect(box.value);
+      if (res.ok) {
+        playTone("correct");
+        generateTimedQRUrl();
+        // 連線成功後順便把老師目前設定的密碼與名單推送上去
+        setTimeout(async () => {
+          if (window.CloudSync.ready) {
+            await window.CloudSync.saveTeacherSettings(state.teacherPin, state.strictRosterOnly);
+            for (const r of state.rosterList) {
+              await window.CloudSync.upsertStudentRoster(r.code, r.name);
+            }
+          }
+          renderTeacherModal();
+        }, 1200);
+      } else {
+        playTone("wrong");
+      }
+      state.rosterNoticeMsg = res.msg;
       renderTeacherModal();
     }
 
@@ -3336,8 +3462,16 @@
           </div>
         `;
       } else {
+        const syncStatus = window.CloudSync ? window.CloudSync.statusText : "🟡 單機模式";
+        const savedFbObj = window.CloudSync ? window.CloudSync.getSavedCustomConfig() : null;
+        const savedFbPreview = savedFbObj ? JSON.stringify(savedFbObj, null, 2) : "";
+
         tabBodyHtml = `
           <div style="text-align:left; background:#f8fbff; border:2px solid var(--border-soft); border-radius:16px; padding:16px;">
+            <div style="background:#ffffff; border:2px solid var(--blue-main); border-radius:12px; padding:10px 12px; margin-bottom:14px; font-size:0.9rem; font-weight:800; color:var(--text-main);">
+              連線狀態：${syncStatus}
+            </div>
+
             <div style="margin-bottom:14px;">
               <label style="font-weight:800; color:var(--blue-dark); display:block; margin-bottom:6px;">
                 🔑 修改教師管理後台密碼（至少 4 碼）：
@@ -3356,9 +3490,26 @@
               </div>
             </label>
 
-            ${state.rosterNoticeMsg ? `<div class="feedback-box success" style="margin-bottom:12px;">${state.rosterNoticeMsg}</div>` : ""}
+            <button class="btn btn-primary" onclick="saveTeacherSecuritySettings()">💾 儲存密碼與門禁設定</button>
 
-            <button class="btn btn-primary" onclick="saveTeacherSecuritySettings()">💾 儲存設定</button>
+            <hr style="border:none; border-top:2px dashed var(--border-soft); margin:16px 0;" />
+
+            <div style="font-weight:800; color:var(--blue-dark); margin-bottom:6px;">
+              ☁️ 跨手機／平板成績同步設定（Firebase 免費資料庫）：
+            </div>
+            <p style="font-size:0.84rem; color:var(--text-muted); font-weight:700; line-height:1.5; margin:0 0 8px;">
+              因為 GitHub Pages 是純靜態網頁，若要讓「學生手機的成績即時傳回老師電腦」，請至 <a href="https://console.firebase.google.com/" target="_blank" style="color:var(--blue-dark);">Firebase Console</a> 建立免費專案（開啟 Firestore 與匿名登入），將 <code>firebaseConfig</code> 貼在下方並儲存；之後產生的 QR Code 就會自動帶入連線資訊！
+            </p>
+            <textarea id="teacherFirebaseConfigInput" rows="4"
+              placeholder='貼上 Firebase 設定，例如：&#10;{&#10;  "apiKey": "AIzaSy...",&#10;  "authDomain": "xxx.firebaseapp.com",&#10;  "projectId": "xxx"&#10;}'
+              style="width:100%; padding:8px; border:2px solid var(--blue-main); border-radius:10px; font-family:monospace; font-size:0.84rem;">${savedFbPreview}</textarea>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+              <button class="btn btn-mint" style="min-height:42px; padding:6px 16px; font-size:0.92rem;" onclick="saveCustomFirebaseConfigFromUI()">
+                🔗 儲存並連線雲端資料庫
+              </button>
+            </div>
+
+            ${state.rosterNoticeMsg ? `<div class="feedback-box success" style="margin-top:12px;">${state.rosterNoticeMsg}</div>` : ""}
           </div>
         `;
       }
@@ -3379,7 +3530,7 @@
                 📋 2. 班級名單與學習紀錄
               </button>
               <button class="modal-tab-btn ${state.teacherModalTab === "settings" ? "active" : ""}" onclick="setTeacherModalTab('settings')">
-                ⚙️ 3. 密碼與門禁設定
+                ⚙️ 3. 雲端同步與密碼設定
               </button>
             </div>
 
