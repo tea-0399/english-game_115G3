@@ -1,0 +1,4965 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Stationery Detective 2.0｜My Little School Life</title>
+  <style>
+    /* ==========================================================================
+       1. 整體色彩系統與基礎排版 (適合國小三年級與 iPad 觸控操作)
+       ========================================================================== */
+    :root {
+      --bg-sky: #eef7ff;
+      --bg-card: #ffffff;
+      --blue-main: #4a90e2;
+      --blue-dark: #2c6bb8;
+      --blue-soft: #d9ecff;
+      --yellow-main: #ffd15c;
+      --yellow-dark: #d99b16;
+      --yellow-soft: #fff6d9;
+      --pink-main: #ff7aa2;
+      --pink-dark: #d84b76;
+      --pink-soft: #ffe6ee;
+      --mint-main: #4cc9a0;
+      --mint-dark: #259470;
+      --mint-soft: #dcf7ee;
+      --purple-main: #8b7ae8;
+      --purple-soft: #f1eeff;
+      --text-main: #283548;
+      --text-muted: #5f6f85;
+      --border-soft: #dbe7f5;
+      --shadow-card: 0 10px 26px rgba(44, 107, 184, 0.12);
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input {
+      user-select: text;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(165deg, #e6f4ff 0%, #fff9e8 52%, #e8fbf3 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 頂部固定導覽列 */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--border-soft);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--blue-dark);
+    }
+
+    .brand-badge {
+      background: var(--yellow-soft);
+      border: 2px solid var(--yellow-main);
+      color: #7c5300;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: var(--yellow-soft);
+      border: 2px solid var(--yellow-main);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #6b4700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-pill.speaking-pill {
+      background: var(--pink-soft);
+      border-color: var(--pink-main);
+      color: var(--pink-dark);
+    }
+
+    .nav-btn {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      border: 2px solid var(--blue-main);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* 主容器 */
+    .app-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      padding: 22px 20px;
+      margin-bottom: 18px;
+    }
+
+    /* 標題與故事卡 */
+    .hero-banner {
+      text-align: center;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+      border-color: #b9dafc;
+    }
+
+    .game-title {
+      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      font-weight: 900;
+      color: var(--blue-dark);
+      margin: 6px 0 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .game-subtitle {
+      font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+      font-weight: 800;
+      color: var(--pink-dark);
+      margin-bottom: 12px;
+    }
+
+    .story-box {
+      background: var(--yellow-soft);
+      border: 2px dashed var(--yellow-dark);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: #4f3a08;
+      max-width: 720px;
+      margin: 0 auto 18px;
+      font-weight: 600;
+    }
+
+    /* 偵探角色選擇卡片 */
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+      margin: 16px 0 22px;
+    }
+
+    .avatar-card {
+      background: #f9fcff;
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .avatar-card.selected {
+      background: var(--mint-soft);
+      border-color: var(--mint-main);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(76, 201, 160, 0.25);
+    }
+
+    .avatar-name-zh {
+      font-weight: 800;
+      font-size: 1.08rem;
+      margin-top: 8px;
+      color: var(--text-main);
+    }
+
+    .avatar-name-en {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+
+    /* 聲線小標籤 */
+    .voice-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .voice-tag.female {
+      background: var(--pink-soft);
+      color: var(--pink-dark);
+    }
+
+    .voice-tag.male {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+    }
+
+    /* 通用大按鈕 (iPad 觸控友善 >= 52px) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 54px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1.08rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #5da4f5 0%, #3b82d6 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 #265fa3;
+    }
+
+    .btn-mint {
+      background: linear-gradient(180deg, #57d6ac 0%, #32b388 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 #218563;
+    }
+
+    .btn-pink {
+      background: linear-gradient(180deg, #ff8eb0 0%, #eb5e88 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 #b83b60;
+    }
+
+    .btn-red {
+      background: linear-gradient(180deg, #ff6b6b 0%, #e03e3e 100%);
+      color: #ffffff;
+      box-shadow: 0 5px 0 #a82424;
+    }
+
+    .btn-yellow {
+      background: linear-gradient(180deg, #ffdc73 0%, #f5be2e 100%);
+      color: #4f3500;
+      box-shadow: 0 5px 0 #c28e0e;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--blue-dark);
+      border: 3px solid var(--blue-main);
+    }
+
+    /* 任務大廳網格 */
+    .hub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, #f3f9ff 0%, #fff9e6 100%);
+    }
+
+    .hub-detective-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .missions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .mission-card {
+      background: #ffffff;
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: transform 0.15s ease;
+    }
+
+    .mission-card.completed {
+      border-color: var(--mint-main);
+      background: linear-gradient(180deg, #ffffff 0%, #f2fcf8 100%);
+    }
+
+    .mission-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      width: fit-content;
+    }
+
+    /* 徽章展示列 */
+    .badges-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .badge-slot {
+      background: #f8fafd;
+      border: 2px dashed #c4d5ea;
+      border-radius: var(--radius-lg);
+      padding: 12px 10px;
+      text-align: center;
+      opacity: 0.58;
+      transition: all 0.2s ease;
+    }
+
+    .badge-slot.earned {
+      opacity: 1;
+      background: var(--yellow-soft);
+      border: 2px solid var(--yellow-main);
+      box-shadow: 0 6px 14px rgba(217, 155, 22, 0.15);
+    }
+
+    /* 關卡內進度條與題目區 */
+    .progress-wrap {
+      margin-bottom: 16px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--blue-dark);
+      margin-bottom: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 14px;
+      background: #e6effa;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-main), var(--mint-main));
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .activity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--pink-soft);
+      color: var(--pink-dark);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .instruction-zh {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 4px 0 14px;
+      line-height: 1.5;
+    }
+
+    .question-box {
+      background: #f6faff;
+      border: 2px solid #d4e6fb;
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .english-prompt {
+      font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin: 0;
+    }
+
+    .audio-btn {
+      background: #ffffff;
+      border: 2px solid var(--blue-main);
+      color: var(--blue-dark);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 48px;
+    }
+
+    .audio-btn:active {
+      transform: scale(0.95);
+      background: var(--blue-soft);
+    }
+
+    /* 選擇題選項格 */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+
+    .options-grid.three-col {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .option-btn {
+      background: #ffffff;
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 16px 14px;
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.14s ease;
+      text-align: center;
+    }
+
+    .option-btn:active {
+      transform: scale(0.97);
+    }
+
+    .option-btn.correct {
+      background: var(--mint-soft);
+      border-color: var(--mint-main);
+      color: #165c45;
+    }
+
+    .option-btn.wrong {
+      background: var(--pink-soft);
+      border-color: var(--pink-main);
+      color: #8f1d40;
+    }
+
+    /* 回饋訊息框 */
+    .feedback-box {
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-top: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.55;
+      animation: popIn 0.22s ease;
+    }
+
+    .feedback-box.success {
+      background: var(--mint-soft);
+      border: 2px solid var(--mint-main);
+      color: #135740;
+    }
+
+    .feedback-box.retry {
+      background: var(--yellow-soft);
+      border: 2px solid var(--yellow-main);
+      color: #5e3f00;
+    }
+
+    .feedback-box.error-alert {
+      background: var(--pink-soft);
+      border: 2px solid var(--pink-main);
+      color: #8f1d40;
+    }
+
+    /* 人物資訊卡樣式 */
+    .profile-card {
+      background: #ffffff;
+      border: 3px solid var(--yellow-main);
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      box-shadow: 0 6px 14px rgba(217, 155, 22, 0.12);
+    }
+
+    .profile-details {
+      text-align: left;
+      font-size: 1.12rem;
+      line-height: 1.7;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .profile-label {
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      padding: 2px 10px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+    }
+
+    /* 探索卡片 (活動一：認識角色與年齡) */
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .explore-card {
+      background: #ffffff;
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .explore-card.visited {
+      border-color: var(--mint-main);
+      background: #f5fdfa;
+    }
+
+    /* 問答配對樣式 */
+    .match-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .match-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .match-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .match-tile {
+      background: #ffffff;
+      border: 3px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .match-tile.selected {
+      background: var(--yellow-soft);
+      border-color: var(--yellow-dark);
+    }
+
+    .match-tile.matched {
+      background: var(--mint-soft);
+      border-color: var(--mint-main);
+      color: #165c45;
+      cursor: default;
+    }
+
+    /* 神祕文具箱動畫 */
+    .mystery-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 10px;
+    }
+
+    .box-container {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .box-container:active {
+      transform: scale(0.95);
+    }
+
+    .item-reveal {
+      animation: popIn 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      background: #ffffff;
+      border: 3px solid var(--mint-main);
+      border-radius: var(--radius-xl);
+      padding: 16px 28px;
+      text-align: center;
+    }
+
+    /* 對話排序互動 (iPad 點擊排序) */
+    .order-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+
+    .order-slot {
+      min-height: 56px;
+      border: 2px dashed #9ec3eb;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.06rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .order-slot.filled {
+      border-style: solid;
+      border-color: var(--blue-main);
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+    }
+
+    .slot-num {
+      background: var(--blue-main);
+      color: #ffffff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .bank-chip {
+      background: #ffffff;
+      border: 3px solid var(--yellow-main);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 52px;
+    }
+
+    .bank-chip:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* 對話泡泡框 */
+    .chat-list {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .chat-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .chat-row.right {
+      flex-direction: row-reverse;
+    }
+
+    .chat-bubble {
+      background: #ffffff;
+      border: 2px solid var(--blue-main);
+      border-radius: 18px;
+      padding: 10px 14px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      max-width: 82%;
+    }
+
+    .chat-row.right .chat-bubble {
+      background: var(--mint-soft);
+      border-color: var(--mint-main);
+    }
+
+    /* 口說練習室元件 (Speaking Practice Studio) */
+    .speaking-studio {
+      background: linear-gradient(135deg, #f3f9ff 0%, #fff8eb 100%);
+      border: 3px solid var(--blue-main);
+      border-radius: var(--radius-xl);
+      padding: 20px 18px;
+      width: 100%;
+      max-width: 660px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .speaking-target-card {
+      background: #ffffff;
+      border: 2px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .speaking-en-text {
+      font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 6px;
+    }
+
+    .speaking-zh-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .live-transcript-box {
+      margin-top: 14px;
+      background: #ffffff;
+      border: 2px dashed var(--pink-main);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .transcript-result-card {
+      margin-top: 14px;
+      background: #ffffff;
+      border: 3px solid var(--blue-main);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: left;
+      animation: popIn 0.25s ease;
+    }
+
+    .score-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border-soft);
+      margin-bottom: 10px;
+    }
+
+    .score-big-badge {
+      background: var(--yellow-soft);
+      border: 2px solid var(--yellow-main);
+      color: #6b4700;
+      border-radius: 14px;
+      padding: 6px 14px;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .score-grade-pill {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+
+    .score-breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .breakdown-item {
+      background: #f8fbff;
+      border: 2px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    .breakdown-label {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .breakdown-val {
+      color: var(--blue-dark);
+      font-weight: 900;
+      font-size: 1.02rem;
+      margin-top: 2px;
+    }
+
+    .disclaimer-note {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #f4f6f9;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .wave-bars {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 28px;
+      margin: 6px 0;
+    }
+
+    .wave-bar {
+      width: 6px;
+      height: 10px;
+      background: var(--pink-main);
+      border-radius: 999px;
+      animation: wavePulse 0.7s infinite ease-in-out;
+    }
+
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; background: var(--yellow-main); }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; background: var(--mint-main); }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; background: var(--blue-main); }
+    .wave-bar:nth-child(5) { animation-delay: 0.2s; background: var(--pink-main); }
+
+    @keyframes wavePulse {
+      0%, 100% { height: 8px; }
+      50% { height: 26px; }
+    }
+
+    /* 最終自我介紹舞台 */
+    .stage-box {
+      background: linear-gradient(160deg, #fffdf5 0%, #eef8ff 100%);
+      border: 3px solid var(--pink-main);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 8px 0 14px;
+    }
+
+    .chip-btn {
+      background: #ffffff;
+      border: 2px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .chip-btn.active {
+      background: var(--blue-main);
+      color: #ffffff;
+      border-color: var(--blue-dark);
+    }
+
+    .name-input {
+      border: 2px solid var(--blue-main);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      width: 150px;
+      text-align: center;
+      color: var(--blue-dark);
+    }
+
+    /* 教師後台與學生五碼登入樣式 */
+    .teacher-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 38, 60, 0.68);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .teacher-modal {
+      background: #ffffff;
+      border: 3px solid var(--blue-main);
+      border-radius: var(--radius-xl);
+      max-width: 720px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 22px 20px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      animation: popIn 0.22s ease;
+    }
+
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border-soft);
+      padding-bottom: 10px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .modal-tab-btn {
+      background: #f3f8ff;
+      border: 2px solid var(--border-soft);
+      color: var(--blue-dark);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .modal-tab-btn.active {
+      background: var(--blue-main);
+      color: #ffffff;
+      border-color: var(--blue-dark);
+    }
+
+    .qr-preview-box {
+      background: #f8fbff;
+      border: 2px dashed var(--blue-main);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin: 14px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qr-preview-box img {
+      width: 210px;
+      height: 210px;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 8px;
+      border: 2px solid var(--border-soft);
+    }
+
+    .timer-pill {
+      background: var(--mint-soft);
+      border: 2px solid var(--mint-main);
+      color: #135740;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .timer-pill.warning {
+      background: var(--pink-soft);
+      border-color: var(--pink-main);
+      color: var(--pink-dark);
+    }
+
+    .student-id-box {
+      background: #f4f9ff;
+      border: 3px solid var(--blue-main);
+      border-radius: 22px;
+      padding: 18px;
+      max-width: 440px;
+      margin: 0 auto 18px;
+    }
+
+    .student-code-input {
+      border: 3px solid var(--blue-main);
+      border-radius: 16px;
+      padding: 10px 16px;
+      font-size: 1.65rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      width: 210px;
+      text-align: center;
+      color: var(--blue-dark);
+      background: #ffffff;
+    }
+
+    .roster-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 2px solid var(--border-soft);
+      border-radius: 16px;
+      margin-top: 10px;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    .roster-table th {
+      background: #eef6ff;
+      color: var(--blue-dark);
+      padding: 10px 10px;
+      font-weight: 800;
+      border-bottom: 2px solid var(--border-soft);
+      white-space: nowrap;
+    }
+
+    .roster-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border-soft);
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .roster-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .speech-card {
+      background: #ffffff;
+      border: 3px solid var(--blue-main);
+      border-radius: var(--radius-xl);
+      padding: 20px 18px;
+      max-width: 640px;
+      margin: 14px auto;
+      box-shadow: 0 8px 20px rgba(74, 144, 226, 0.14);
+    }
+
+    .speech-line {
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin: 8px 0;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.92); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部狀態與控制列 -->
+  <header class="topbar">
+    <div class="brand-pill">
+      <span>🔍 Stationery Detective 2.0</span>
+      <span class="brand-badge">國小三年級英語</span>
+    </div>
+    <div class="topbar-controls">
+      <div class="stat-pill hidden" id="studentBadgePill" style="background:var(--blue-soft); border-color:var(--blue-main); color:var(--blue-dark);">🎒 30101</div>
+      <div class="stat-pill hidden" id="classTimerPill" title="本堂課剩餘練習時間">⏳ 剩餘 40:00</div>
+      <div class="stat-pill" id="starCounter" title="原本四大任務遊戲星星">⭐ 0 / 26</div>
+      <div class="stat-pill speaking-pill" id="speakingStarCounter" title="額外口說練習星星">🎙️ 口說星：0</div>
+      <button class="nav-btn" id="btnTeacherQR" onclick="openTeacherModal()">👩‍🏫 教師管理</button>
+      <button class="nav-btn" id="btnSoundToggle" onclick="toggleMute()">🔊 音效開</button>
+      <button class="nav-btn hidden" id="btnHubNav" onclick="goToHub()">🏫 任務大廳</button>
+    </div>
+  </header>
+
+  <!-- 動態遊戲主畫面容器 -->
+  <main class="app-container" id="app"></main>
+  <div id="teacherModalRoot"></div>
+
+  <!-- Firebase 雲端資料庫連線（支援班級名單與學生學習紀錄跨裝置同步） -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    window.CloudSync = {
+      ready: false,
+      db: null,
+      auth: null,
+      user: null,
+      appId: typeof __app_id !== "undefined" ? __app_id : "stationery-detective-default",
+      init: async function () {
+        try {
+          if (typeof __firebase_config === "undefined" || !__firebase_config) return;
+          const firebaseConfig = JSON.parse(__firebase_config);
+          const app = initializeApp(firebaseConfig);
+          this.auth = getAuth(app);
+          this.db = getFirestore(app);
+
+          if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
+            await signInWithCustomToken(this.auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(this.auth);
+          }
+
+          onAuthStateChanged(this.auth, (user) => {
+            this.user = user;
+            if (user) {
+              this.ready = true;
+              this.subscribeAll();
+            }
+          });
+        } catch (e) {
+          console.warn("CloudSync fallback to memory:", e);
+        }
+      },
+      subscribeAll: function () {
+        if (!this.ready || !this.user || !this.db) return;
+
+        // 監聽教師設定（密碼與是否限制名單）
+        const settingsRef = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "teacherConfig");
+        onSnapshot(settingsRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data.pin) state.teacherPin = data.pin;
+            if (typeof data.strictRoster === "boolean") state.strictRosterOnly = data.strictRoster;
+            if (state.showTeacherModal) renderTeacherModal();
+          }
+        }, (err) => console.warn(err));
+
+        // 監聽班級學生名單
+        const rosterCol = collection(this.db, "artifacts", this.appId, "public", "data", "roster");
+        onSnapshot(rosterCol, (snap) => {
+          const list = [];
+          snap.forEach((d) => list.push(d.data()));
+          list.sort((a, b) => String(a.code).localeCompare(String(b.code)));
+          state.rosterList = list;
+          if (state.showTeacherModal) renderTeacherModal();
+        }, (err) => console.warn(err));
+
+        // 監聽學生學習進度紀錄
+        const progressCol = collection(this.db, "artifacts", this.appId, "public", "data", "studentProgress");
+        onSnapshot(progressCol, (snap) => {
+          const map = {};
+          snap.forEach((d) => {
+            map[d.id] = d.data();
+          });
+          state.progressMap = map;
+          if (state.showTeacherModal) renderTeacherModal();
+        }, (err) => console.warn(err));
+      },
+      saveTeacherSettings: async function (pin, strictRoster) {
+        if (!this.ready || !this.user || !this.db) return;
+        const settingsRef = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "teacherConfig");
+        await setDoc(settingsRef, { pin, strictRoster, updatedAt: Date.now() }, { merge: true });
+      },
+      upsertStudentRoster: async function (code, name) {
+        if (!this.ready || !this.user || !this.db) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "roster", code);
+        await setDoc(ref, { code, name: name || "", updatedAt: Date.now() }, { merge: true });
+      },
+      removeStudentRoster: async function (code) {
+        if (!this.ready || !this.user || !this.db) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "roster", code);
+        await deleteDoc(ref);
+      },
+      saveStudentProgress: async function (payload) {
+        if (!this.ready || !this.user || !this.db || !payload.code) return;
+        const ref = doc(this.db, "artifacts", this.appId, "public", "data", "studentProgress", payload.code);
+        await setDoc(ref, payload, { merge: true });
+      },
+      fetchStudentProgressOnce: async function (code) {
+        if (!this.ready || !this.user || !this.db || !code) return null;
+        try {
+          const ref = doc(this.db, "artifacts", this.appId, "public", "data", "studentProgress", code);
+          const snap = await getDoc(ref);
+          return snap.exists() ? snap.data() : null;
+        } catch (e) {
+          return null;
+        }
+      }
+    };
+
+    window.CloudSync.init();
+  </script>
+
+  <script>
+    /* ==========================================================================
+       1. 內嵌高辨識度 SVG 插圖庫 (無外部圖片依賴)
+       - 保留原本 Fox / Panda / Cat / Rabbit、Amy / Tom / Ben 與 6 種文具插圖
+       ========================================================================== */
+    function getDetectiveSVG(type, size = 104) {
+      const commonHat = `
+        <path d="M28 34 Q60 14 92 34 L98 40 Q60 32 22 40 Z" fill="#c89d66" stroke="#5c4020" stroke-width="3"/>
+        <ellipse cx="60" cy="38" rx="42" ry="7" fill="#b3844b" stroke="#5c4020" stroke-width="3"/>
+        <rect x="33" y="29" width="54" height="6" rx="3" fill="#4a90e2"/>
+      `;
+      const magnifier = `
+        <g transform="translate(76, 74) rotate(-25)">
+          <circle cx="14" cy="14" r="12" fill="#d9f2ff" stroke="#3b5998" stroke-width="3.5"/>
+          <path d="M9 10 Q14 7 18 11" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <line x1="14" y1="26" x2="14" y2="42" stroke="#8b5a2b" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      `;
+
+      if (type === "fox") {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="狐狸小偵探">
+          <circle cx="60" cy="64" r="46" fill="#fff3e0"/>
+          <polygon points="26,46 34,14 54,36" fill="#ff8c42" stroke="#5c3317" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="94,46 86,14 66,36" fill="#ff8c42" stroke="#5c3317" stroke-width="3" stroke-linejoin="round"/>
+          <ellipse cx="60" cy="68" rx="34" ry="29" fill="#ff8c42" stroke="#5c3317" stroke-width="3"/>
+          <path d="M27 68 Q43 62 60 76 Q77 62 93 68 Q86 95 60 97 Q34 95 27 68 Z" fill="#ffffff"/>
+          <circle cx="47" cy="63" r="4.2" fill="#2b2b2b"/>
+          <circle cx="73" cy="63" r="4.2" fill="#2b2b2b"/>
+          <circle cx="48.5" cy="61.5" r="1.4" fill="#ffffff"/>
+          <circle cx="74.5" cy="61.5" r="1.4" fill="#ffffff"/>
+          <ellipse cx="60" cy="74" rx="5" ry="3.5" fill="#2b2b2b"/>
+          <path d="M53 81 Q60 87 67 81" stroke="#2b2b2b" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          ${commonHat}
+          ${magnifier}
+        </svg>`;
+      }
+      if (type === "panda") {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="熊貓小偵探">
+          <circle cx="60" cy="64" r="46" fill="#e8f8f2"/>
+          <circle cx="32" cy="34" r="13" fill="#2d3436"/>
+          <circle cx="88" cy="34" r="13" fill="#2d3436"/>
+          <ellipse cx="60" cy="68" rx="35" ry="30" fill="#ffffff" stroke="#2d3436" stroke-width="3"/>
+          <ellipse cx="45" cy="63" rx="9" ry="11" transform="rotate(-18 45 63)" fill="#2d3436"/>
+          <ellipse cx="75" cy="63" rx="9" ry="11" transform="rotate(18 75 63)" fill="#2d3436"/>
+          <circle cx="46" cy="62" r="3.5" fill="#ffffff"/>
+          <circle cx="74" cy="62" r="3.5" fill="#ffffff"/>
+          <ellipse cx="60" cy="75" rx="5.5" ry="3.8" fill="#2d3436"/>
+          <path d="M53 82 Q60 88 67 82" stroke="#2d3436" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          ${commonHat}
+          ${magnifier}
+        </svg>`;
+      }
+      if (type === "cat") {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="貓咪小偵探">
+          <circle cx="60" cy="64" r="46" fill="#fff0f5"/>
+          <polygon points="26,48 30,16 52,36" fill="#ffd166" stroke="#6b4f1d" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="94,48 90,16 68,36" fill="#ffd166" stroke="#6b4f1d" stroke-width="3" stroke-linejoin="round"/>
+          <ellipse cx="60" cy="68" rx="34" ry="29" fill="#ffe08a" stroke="#6b4f1d" stroke-width="3"/>
+          <circle cx="46" cy="64" r="4.2" fill="#2d3436"/>
+          <circle cx="74" cy="64" r="4.2" fill="#2d3436"/>
+          <polygon points="56,73 64,73 60,78" fill="#ff7aa2"/>
+          <path d="M52 81 Q60 86 68 81" stroke="#6b4f1d" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <line x1="20" y1="68" x2="35" y2="70" stroke="#6b4f1d" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="20" y1="76" x2="35" y2="75" stroke="#6b4f1d" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="100" y1="68" x2="85" y2="70" stroke="#6b4f1d" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="100" y1="76" x2="85" y2="75" stroke="#6b4f1d" stroke-width="2.2" stroke-linecap="round"/>
+          ${commonHat}
+          ${magnifier}
+        </svg>`;
+      }
+      return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="兔子小偵探">
+        <circle cx="60" cy="64" r="46" fill="#eef6ff"/>
+        <ellipse cx="44" cy="24" rx="8" ry="22" fill="#ffffff" stroke="#5c6b80" stroke-width="3"/>
+        <ellipse cx="44" cy="24" rx="4" ry="15" fill="#ffb3c6"/>
+        <ellipse cx="76" cy="24" rx="8" ry="22" fill="#ffffff" stroke="#5c6b80" stroke-width="3"/>
+        <ellipse cx="76" cy="24" rx="4" ry="15" fill="#ffb3c6"/>
+        <ellipse cx="60" cy="70" rx="33" ry="28" fill="#ffffff" stroke="#5c6b80" stroke-width="3"/>
+        <circle cx="47" cy="65" r="4.2" fill="#2d3436"/>
+        <circle cx="73" cy="65" r="4.2" fill="#2d3436"/>
+        <circle cx="38" cy="74" r="5" fill="#ffc2d1" opacity="0.8"/>
+        <circle cx="82" cy="74" r="5" fill="#ffc2d1" opacity="0.8"/>
+        <ellipse cx="60" cy="74" rx="4.5" ry="3.2" fill="#ff7aa2"/>
+        <path d="M54 80 Q60 85 66 80" stroke="#5c6b80" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        ${commonHat}
+        ${magnifier}
+      </svg>`;
+    }
+
+    function getFriendSVG(name, size = 100) {
+      if (name === "Amy") {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="Amy">
+          <circle cx="60" cy="60" r="52" fill="#ffe8f0"/>
+          <circle cx="28" cy="44" r="14" fill="#5c3a21"/>
+          <circle cx="92" cy="44" r="14" fill="#5c3a21"/>
+          <circle cx="32" cy="36" r="5" fill="#ff7aa2"/>
+          <circle cx="88" cy="36" r="5" fill="#ff7aa2"/>
+          <circle cx="60" cy="62" r="32" fill="#ffe0bd" stroke="#7c5338" stroke-width="2.8"/>
+          <path d="M28 56 Q44 32 60 44 Q76 32 92 56 Q88 26 60 26 Q32 26 28 56 Z" fill="#5c3a21"/>
+          <circle cx="48" cy="62" r="3.8" fill="#2b2b2b"/>
+          <circle cx="72" cy="62" r="3.8" fill="#2b2b2b"/>
+          <circle cx="40" cy="70" r="4.5" fill="#ff9eb5" opacity="0.7"/>
+          <circle cx="80" cy="70" r="4.5" fill="#ff9eb5" opacity="0.7"/>
+          <path d="M51 74 Q60 83 69 74" stroke="#d84b76" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M36 96 Q60 88 84 96 L88 110 L32 110 Z" fill="#ff7aa2"/>
+        </svg>`;
+      }
+      if (name === "Tom") {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="Tom">
+          <circle cx="60" cy="60" r="52" fill="#e3f2fd"/>
+          <circle cx="60" cy="62" r="32" fill="#ffe0bd" stroke="#6e4b32" stroke-width="2.8"/>
+          <path d="M28 56 Q34 26 60 26 Q86 26 92 56 Q78 42 60 45 Q42 42 28 56 Z" fill="#3b2818"/>
+          <polygon points="48,28 60,18 66,28" fill="#3b2818"/>
+          <circle cx="48" cy="63" r="3.8" fill="#2b2b2b"/>
+          <circle cx="72" cy="63" r="3.8" fill="#2b2b2b"/>
+          <path d="M51 75 Q60 83 69 75" stroke="#6e4b32" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M36 96 Q60 88 84 96 L88 110 L32 110 Z" fill="#4a90e2"/>
+        </svg>`;
+      }
+      return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" aria-label="Ben">
+        <circle cx="60" cy="60" r="52" fill="#e6f9f1"/>
+        <circle cx="60" cy="62" r="32" fill="#f7cfa4" stroke="#634229" stroke-width="2.8"/>
+        <path d="M28 54 Q30 24 60 24 Q90 24 92 54 Q76 38 60 40 Q44 38 28 54 Z" fill="#2d3436"/>
+        <rect x="39" y="56" width="17" height="13" rx="4" fill="none" stroke="#2c6bb8" stroke-width="2.8"/>
+        <rect x="64" y="56" width="17" height="13" rx="4" fill="none" stroke="#2c6bb8" stroke-width="2.8"/>
+        <line x1="56" y1="62" x2="64" y2="62" stroke="#2c6bb8" stroke-width="2.8"/>
+        <circle cx="47.5" cy="62.5" r="3.2" fill="#2b2b2b"/>
+        <circle cx="72.5" cy="62.5" r="3.2" fill="#2b2b2b"/>
+        <path d="M52 76 Q60 83 68 76" stroke="#634229" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M36 96 Q60 88 84 96 L88 110 L32 110 Z" fill="#4cc9a0"/>
+      </svg>`;
+    }
+
+    function getStationerySVG(item, size = 120) {
+      switch (item) {
+        case "book":
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="a book 書本">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#eef6ff"/>
+            <g transform="translate(26, 22)">
+              <rect x="6" y="6" width="76" height="90" rx="8" fill="#3b82d6" stroke="#1e4e8c" stroke-width="3.5"/>
+              <rect x="14" y="6" width="68" height="84" rx="6" fill="#5da4f5" stroke="#1e4e8c" stroke-width="3.5"/>
+              <path d="M14 84 L82 84 L82 94 L14 94 Q8 94 8 89 Q8 84 14 84 Z" fill="#ffffff" stroke="#1e4e8c" stroke-width="3"/>
+              <line x1="18" y1="89" x2="78" y2="89" stroke="#9ec3eb" stroke-width="2"/>
+              <rect x="26" y="20" width="44" height="24" rx="5" fill="#fff6d9" stroke="#1e4e8c" stroke-width="2.5"/>
+              <text x="48" y="36" text-anchor="middle" font-size="13" font-weight="900" fill="#1e4e8c" font-family="sans-serif">ABC</text>
+              <polygon points="48,52 51,59 59,59 53,64 55,71 48,67 41,71 43,64 37,59 45,59" fill="#ffd15c" stroke="#1e4e8c" stroke-width="2"/>
+            </g>
+          </svg>`;
+
+        case "pen":
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="a pen 原子筆">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#f0f9ff"/>
+            <g transform="translate(70, 70) rotate(-42)">
+              <rect x="-8" y="-48" width="16" height="12" rx="4" fill="#2c6bb8" stroke="#1b3f6e" stroke-width="3"/>
+              <rect x="-10" y="-38" width="20" height="62" rx="5" fill="#4a90e2" stroke="#1b3f6e" stroke-width="3"/>
+              <rect x="-10" y="6" width="20" height="18" fill="#89c2ff" stroke="#1b3f6e" stroke-width="2.5"/>
+              <path d="M10 -32 L17 -32 L17 -4" fill="none" stroke="#1b3f6e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <polygon points="-10,24 10,24 3,42 -3,42" fill="#dfe6e9" stroke="#1b3f6e" stroke-width="3" stroke-linejoin="round"/>
+              <polygon points="-3,42 3,42 0,50" fill="#1b3f6e"/>
+            </g>
+          </svg>`;
+
+        case "pencil":
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="a pencil 鉛筆">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#fffbeb"/>
+            <g transform="translate(70, 70) rotate(-42)">
+              <rect x="-10" y="-48" width="20" height="13" rx="4" fill="#ff85a1" stroke="#5c3d1e" stroke-width="3"/>
+              <rect x="-10" y="-36" width="20" height="8" fill="#cfd8dc" stroke="#5c3d1e" stroke-width="3"/>
+              <rect x="-10" y="-28" width="20" height="54" fill="#ffd15c" stroke="#5c3d1e" stroke-width="3"/>
+              <line x1="-3.5" y1="-28" x2="-3.5" y2="26" stroke="#e0a82e" stroke-width="2"/>
+              <line x1="3.5" y1="-28" x2="3.5" y2="26" stroke="#e0a82e" stroke-width="2"/>
+              <polygon points="-10,26 10,26 0,48" fill="#f7d3a8" stroke="#5c3d1e" stroke-width="3" stroke-linejoin="round"/>
+              <polygon points="-3.5,40 3.5,40 0,48" fill="#2d3436"/>
+            </g>
+          </svg>`;
+
+        case "eraser":
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="an eraser 橡皮擦">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#fff5f8"/>
+            <g transform="translate(70, 72) rotate(-22)">
+              <path d="M-44 -14 L44 -14 L44 16 Q44 22 38 22 L-38 22 Q-44 22 -44 16 Z" fill="#ff9eb5" stroke="#5c2b3b" stroke-width="3.2"/>
+              <rect x="-44" y="-20" width="88" height="28" rx="6" fill="#ffb3c6" stroke="#5c2b3b" stroke-width="3.2"/>
+              <rect x="-18" y="-21" width="54" height="44" rx="4" fill="#ffffff" stroke="#2c6bb8" stroke-width="3.2"/>
+              <rect x="-18" y="-12" width="54" height="12" fill="#4a90e2"/>
+              <text x="9" y="13" text-anchor="middle" font-size="9.5" font-weight="900" fill="#2c6bb8" font-family="sans-serif">ERASER</text>
+            </g>
+          </svg>`;
+
+        case "marker":
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="a marker 彩色筆/白板筆">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#eefcf7"/>
+            <g transform="translate(70, 70) rotate(-42)">
+              <rect x="-13" y="-46" width="26" height="12" rx="4" fill="#259470" stroke="#1b4d3e" stroke-width="3"/>
+              <rect x="-14" y="-35" width="28" height="56" rx="5" fill="#ffffff" stroke="#1b4d3e" stroke-width="3.2"/>
+              <rect x="-14" y="-18" width="28" height="24" fill="#4cc9a0" stroke="#1b4d3e" stroke-width="2.5"/>
+              <text x="0" y="-2" text-anchor="middle" font-size="7.5" font-weight="900" fill="#ffffff" font-family="sans-serif">MARKER</text>
+              <path d="M-12 21 L12 21 L8 33 L-8 33 Z" fill="#dfe6e9" stroke="#1b4d3e" stroke-width="3" stroke-linejoin="round"/>
+              <polygon points="-5,33 5,33 5,45 -5,41" fill="#259470" stroke="#1b4d3e" stroke-width="2.5" stroke-linejoin="round"/>
+            </g>
+          </svg>`;
+
+        case "ruler":
+        default:
+          return `<svg width="${size}" height="${size}" viewBox="0 0 140 140" aria-label="a ruler 直尺">
+            <rect x="14" y="14" width="112" height="112" rx="22" fill="#f3f0ff"/>
+            <g transform="translate(70, 70) rotate(-32)">
+              <rect x="-52" y="-18" width="104" height="36" rx="6" fill="#ffd15c" stroke="#6b4f1d" stroke-width="3.2"/>
+              <line x1="-40" y1="-18" x2="-40" y2="-4" stroke="#6b4f1d" stroke-width="2.5"/>
+              <line x1="-28" y1="-18" x2="-28" y2="-9" stroke="#6b4f1d" stroke-width="2.2"/>
+              <line x1="-16" y1="-18" x2="-16" y2="-4" stroke="#6b4f1d" stroke-width="2.5"/>
+              <line x1="-4" y1="-18" x2="-4" y2="-9" stroke="#6b4f1d" stroke-width="2.2"/>
+              <line x1="8" y1="-18" x2="8" y2="-4" stroke="#6b4f1d" stroke-width="2.5"/>
+              <line x1="20" y1="-18" x2="20" y2="-9" stroke="#6b4f1d" stroke-width="2.2"/>
+              <line x1="32" y1="-18" x2="32" y2="-4" stroke="#6b4f1d" stroke-width="2.5"/>
+              <line x1="44" y1="-18" x2="44" y2="-9" stroke="#6b4f1d" stroke-width="2.2"/>
+              <text x="-40" y="10" text-anchor="middle" font-size="10" font-weight="800" fill="#6b4f1d" font-family="sans-serif">1</text>
+              <text x="-16" y="10" text-anchor="middle" font-size="10" font-weight="800" fill="#6b4f1d" font-family="sans-serif">2</text>
+              <text x="8" y="10" text-anchor="middle" font-size="10" font-weight="800" fill="#6b4f1d" font-family="sans-serif">3</text>
+              <text x="32" y="10" text-anchor="middle" font-size="10" font-weight="800" fill="#6b4f1d" font-family="sans-serif">4</text>
+            </g>
+          </svg>`;
+      }
+    }
+
+    function getNearFarSceneSVG(nearItem, farItem, target) {
+      const isThis = target === "this";
+      return `
+        <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center; align-items:stretch; width:100%;">
+          <div style="flex:1; min-width:220px; max-width:290px; background:${isThis ? '#fff6d9' : '#f4f7fb'}; border:3px ${isThis ? 'solid #f5be2e' : 'dashed #b9cbe0'}; border-radius:20px; padding:12px; text-align:center;">
+            <div style="font-size:0.88rem; font-weight:800; color:${isThis ? '#8c5d00' : '#64748b'}; margin-bottom:6px;">
+              👇 靠近手邊 (NEAR) ${isThis ? '⬅ 問這個！' : ''}
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
+              ${getDetectiveSVG(state.avatar, 74)}
+              <span style="font-size:1.5rem;">👉</span>
+              ${getStationerySVG(nearItem, 84)}
+            </div>
+            <div style="margin-top:6px; font-weight:800; font-size:0.95rem; color:#2c6bb8;">
+              靠近自己用 <u>this</u>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:220px; max-width:290px; background:${!isThis ? '#fff6d9' : '#f4f7fb'}; border:3px ${!isThis ? 'solid #f5be2e' : 'dashed #b9cbe0'}; border-radius:20px; padding:12px; text-align:center;">
+            <div style="font-size:0.88rem; font-weight:800; color:${!isThis ? '#8c5d00' : '#64748b'}; margin-bottom:6px;">
+              🔭 教室遠處黑板旁 (FAR) ${!isThis ? '⬅ 問那個！' : ''}
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span style="font-size:1.3rem;">〰️〰️👉</span>
+              ${getStationerySVG(farItem, 84)}
+            </div>
+            <div style="margin-top:6px; font-weight:800; font-size:0.95rem; color:#2c6bb8;">
+              距離較遠用 <u>that</u>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getMysteryBoxSVG(isOpen) {
+      if (!isOpen) {
+        return `<svg width="170" height="150" viewBox="0 0 180 160" aria-label="神祕文具箱">
+          <rect x="26" y="54" width="128" height="88" rx="14" fill="#ffd15c" stroke="#8a5a00" stroke-width="4"/>
+          <rect x="20" y="36" width="140" height="24" rx="10" fill="#ff9f43" stroke="#8a5a00" stroke-width="4"/>
+          <rect x="80" y="36" width="20" height="106" fill="#ff7aa2" stroke="#8a5a00" stroke-width="3"/>
+          <circle cx="90" cy="96" r="18" fill="#ffffff" stroke="#8a5a00" stroke-width="3"/>
+          <text x="90" y="104" text-anchor="middle" font-size="24" font-weight="900" fill="#d84b76" font-family="sans-serif">?</text>
+        </svg>`;
+      }
+      return `<svg width="170" height="110" viewBox="0 0 180 120" aria-label="已打開的神祕箱">
+        <path d="M22 44 L44 16 L136 16 L158 44 Z" fill="#ffbe76" stroke="#8a5a00" stroke-width="3.5"/>
+        <rect x="26" y="44" width="128" height="66" rx="12" fill="#ffd15c" stroke="#8a5a00" stroke-width="4"/>
+        <rect x="80" y="44" width="20" height="66" fill="#ff7aa2" stroke="#8a5a00" stroke-width="3"/>
+      </svg>`;
+    }
+
+    /* ==========================================================================
+       2. 音效與性別分聲道英語語音朗讀系統 (Web Audio API + Web Speech API)
+       ========================================================================== */
+    let isMuted = false;
+    let audioCtx = null;
+    let cachedVoices = [];
+
+    function loadSystemVoices() {
+      try {
+        if ("speechSynthesis" in window) {
+          cachedVoices = window.speechSynthesis.getVoices() || [];
+        }
+      } catch (e) {
+        cachedVoices = [];
+      }
+    }
+
+    if ("speechSynthesis" in window) {
+      loadSystemVoices();
+      window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+    }
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(type) {
+      if (isMuted) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === "click") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(520, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === "correct") {
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.09);
+          osc.frequency.setValueAtTime(783.99, now + 0.18);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+          osc.start(now);
+          osc.stop(now + 0.36);
+        } else if (type === "wrong") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.setValueAtTime(260, now + 0.12);
+          gain.gain.setValueAtTime(0.11, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.start(now);
+          osc.stop(now + 0.28);
+        } else if (type === "fanfare") {
+          osc.type = "triangle";
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, idx) => {
+            osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+          });
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+          osc.start(now);
+          osc.stop(now + 0.55);
+        }
+      } catch (e) {}
+    }
+
+    function pickVoiceByGender(gender) {
+      if (!cachedVoices.length) loadSystemVoices();
+      const enVoices = cachedVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith("en"));
+      if (!enVoices.length) return null;
+
+      const femaleKeywords = ["samantha", "victoria", "karen", "moira", "tessa", "zira", "jenny", "aria", "ava", "allison", "susan", "female", "woman", "girl", "google us english"];
+      const maleKeywords = ["alex", "daniel", "fred", "tom", "oliver", "david", "mark", "guy", "christopher", "aaron", "arthur", "male", "man", "boy"];
+
+      const targetKeywords = gender === "male" ? maleKeywords : femaleKeywords;
+
+      let matched = enVoices.find(v =>
+        v.lang.toLowerCase().includes("us") &&
+        targetKeywords.some(kw => v.name.toLowerCase().includes(kw))
+      );
+
+      if (!matched) {
+        matched = enVoices.find(v =>
+          targetKeywords.some(kw => v.name.toLowerCase().includes(kw))
+        );
+      }
+
+      if (!matched && gender === "male") {
+        matched = enVoices.find(v => !femaleKeywords.some(kw => v.name.toLowerCase().includes(kw)));
+      }
+
+      return matched || enVoices[0];
+    }
+
+    function speakEnglish(text, gender = "auto") {
+      if (isMuted) return;
+      try {
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = "en-US";
+          utter.rate = 0.88;
+
+          let resolvedGender = gender;
+          if (resolvedGender === "auto") {
+            const lower = text.toLowerCase();
+            if (/\b(tom|ben|he|he's|his)\b/.test(lower)) {
+              resolvedGender = "male";
+            } else if (/\b(amy|mia|lily|she|she's|her)\b/.test(lower)) {
+              resolvedGender = "female";
+            } else {
+              const detective = DETECTIVES.find(d => d.id === state.avatar);
+              resolvedGender = detective ? detective.gender : "female";
+            }
+          }
+
+          const chosenVoice = pickVoiceByGender(resolvedGender);
+          if (chosenVoice) {
+            utter.voice = chosenVoice;
+          }
+
+          utter.pitch = resolvedGender === "male" ? 0.86 : 1.14;
+          window.speechSynthesis.speak(utter);
+        }
+      } catch (e) {}
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      const btn = document.getElementById("btnSoundToggle");
+      btn.textContent = isMuted ? "🔇 靜音中" : "🔊 音效開";
+      if (!isMuted) playTone("click");
+    }
+
+    /* ==========================================================================
+       3. 瀏覽器 Web Speech API 與口說估算評分引擎 (Speech Recognition & Scoring)
+       - 優先使用 window.SpeechRecognition，兼容 window.webkitSpeechRecognition
+       - lang = "en-US", continuous = false, interimResults = true
+       ========================================================================== */
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    const isSpeechRecognitionSupported = !!SpeechRecognitionAPI;
+
+    let activeRecognition = null;
+    let recSessionToken = 0;
+
+    // 英文文字正規化（忽略大小寫、標點、多餘空格，並統一常見縮寫與數字）
+    function normalizeEnglishText(raw) {
+      if (!raw) return "";
+      let s = raw.toLowerCase();
+      s = s.replace(/[’‘`]/g, "'");
+      const contractions = [
+        [/\bi'm\b/g, "i am"],
+        [/\bwhat's\b/g, "what is"],
+        [/\bit's\b/g, "it is"],
+        [/\bshe's\b/g, "she is"],
+        [/\bhe's\b/g, "he is"],
+        [/\bthat's\b/g, "that is"],
+        [/\bmy name's\b/g, "my name is"],
+        [/\byou're\b/g, "you are"],
+        [/\b8\b/g, "eight"],
+        [/\b9\b/g, "nine"],
+        [/\b10\b/g, "ten"]
+      ];
+      contractions.forEach(([pattern, replacement]) => {
+        s = s.replace(pattern, replacement);
+      });
+      s = s.replace(/[^a-z0-9\s]/g, " ");
+      s = s.replace(/\s+/g, " ").trim();
+      return s;
+    }
+
+    // Levenshtein 編輯距離演算法
+    function levenshteinDistance(a, b) {
+      const m = a.length;
+      const n = b.length;
+      if (m === 0) return n;
+      if (n === 0) return m;
+
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    // 單字層級編輯距離
+    function wordLevenshteinDistance(wordsA, wordsB) {
+      const m = wordsA.length;
+      const n = wordsB.length;
+      if (m === 0) return n;
+      if (n === 0) return m;
+
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = wordsA[i - 1] === wordsB[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    /**
+     * 估算評分計算核心 (完全依據實際辨識文字與真實語音時間計算，絕不隨機給分)
+     * 1. 句子符合度：60 分
+     * 2. 句子完整度：25 分
+     * 3. 流暢度估算：15 分 (僅在有可靠語音時間資訊時提供，否則標示「目前無法估算」)
+     */
+    function evaluateSpeakingAttempt(targetEn, spokenRaw, speechDurationMs) {
+      const normTarget = normalizeEnglishText(targetEn);
+      const normSpoken = normalizeEnglishText(spokenRaw);
+
+      const targetWords = normTarget ? normTarget.split(" ") : [];
+      const spokenWords = normSpoken ? normSpoken.split(" ") : [];
+
+      if (!normSpoken || spokenWords.length === 0) {
+        return {
+          hasValidSpeech: false,
+          errorMessage: "沒有偵測到清晰的英語語音，請靠近麥克風再試一次。"
+        };
+      }
+
+      // 1. 句子符合度 (滿分 60 分)：結合字元與單字編輯距離相似度
+      const maxCharLen = Math.max(normTarget.length, normSpoken.length);
+      const charDist = levenshteinDistance(normTarget, normSpoken);
+      const charSim = maxCharLen > 0 ? Math.max(0, 1 - charDist / maxCharLen) : 0;
+
+      const maxWordLen = Math.max(targetWords.length, spokenWords.length);
+      const wordDist = wordLevenshteinDistance(targetWords, spokenWords);
+      const wordSim = maxWordLen > 0 ? Math.max(0, 1 - wordDist / maxWordLen) : 0;
+
+      const combinedSim = charSim * 0.55 + wordSim * 0.45;
+      const accuracyScore = Math.round(combinedSim * 60);
+
+      // 2. 句子完整度 (滿分 25 分)：檢查標準句中的每個單字是否被念出，以及是否漏字
+      const remainingSpoken = [...spokenWords];
+      const missingWords = [];
+      let matchedWordCount = 0;
+
+      targetWords.forEach(tw => {
+        const foundIdx = remainingSpoken.indexOf(tw);
+        if (foundIdx !== -1) {
+          matchedWordCount += 1;
+          remainingSpoken.splice(foundIdx, 1);
+        } else {
+          missingWords.push(tw);
+        }
+      });
+
+      const coverageRatio = targetWords.length > 0 ? matchedWordCount / targetWords.length : 0;
+      const completenessScore = Math.round(coverageRatio * 25);
+
+      // 3. 流暢度估算 (滿分 15 分)
+      // 僅在取得真實語音起訖時間 (onspeechstart -> onspeechend) 且有效字數 >= 2 時才估算
+      let fluencyAvailable = false;
+      let fluencyScore = null;
+      let fluencyText = "目前無法估算";
+
+      if (
+        typeof speechDurationMs === "number" &&
+        speechDurationMs >= 350 &&
+        speechDurationMs <= 20000 &&
+        spokenWords.length >= 2
+      ) {
+        const durationSec = speechDurationMs / 1000;
+        const wps = spokenWords.length / durationSec;
+        if (wps >= 0.4 && wps <= 5.5) {
+          fluencyAvailable = true;
+          let paceFactor = 1.0;
+          if (wps < 0.9) {
+            paceFactor = Math.max(0.5, wps / 0.9);
+          } else if (wps > 3.2) {
+            paceFactor = Math.max(0.6, 1 - (wps - 3.2) / 3.5);
+          }
+          const rawFluency = 15 * paceFactor * Math.max(0.4, coverageRatio);
+          fluencyScore = Math.round(Math.min(15, Math.max(0, rawFluency)));
+          fluencyText = `${fluencyScore} / 15 分`;
+        }
+      }
+
+      // 計算總分與百分比換算
+      let finalPercentScore = 0;
+      let isPartialAssessment = false;
+
+      if (fluencyAvailable && fluencyScore !== null) {
+        finalPercentScore = Math.min(100, accuracyScore + completenessScore + fluencyScore);
+        isPartialAssessment = false;
+      } else {
+        // 若流暢度無法估算，依照可評估的 85 分 (60 + 25) 重新換算百分比，不可當成 0 分或補分
+        const evaluableEarned = accuracyScore + completenessScore;
+        finalPercentScore = Math.min(100, Math.round((evaluableEarned / 85) * 100));
+        isPartialAssessment = true;
+      }
+
+      // 評分等級與口說練習星星獎勵 (與原本 26 顆遊戲星星分開)
+      let gradeLabel = "Let's Try Again!";
+      let gradeColor = "var(--pink-dark)";
+      let gradeBg = "var(--pink-soft)";
+      let speakingStars = 0;
+
+      if (finalPercentScore >= 90) {
+        gradeLabel = "Excellent!";
+        gradeColor = "#135740";
+        gradeBg = "var(--mint-soft)";
+        speakingStars = 3;
+      } else if (finalPercentScore >= 80) {
+        gradeLabel = "Great Job!";
+        gradeColor = "var(--blue-dark)";
+        gradeBg = "var(--blue-soft)";
+        speakingStars = 2;
+      } else if (finalPercentScore >= 70) {
+        gradeLabel = "Good!";
+        gradeColor = "#7c5300";
+        gradeBg = "var(--yellow-soft)";
+        speakingStars = 1;
+      } else if (finalPercentScore >= 60) {
+        gradeLabel = "Keep Practicing!";
+        gradeColor = "#8a4b00";
+        gradeBg = "#fff1db";
+        speakingStars = 0;
+      } else {
+        gradeLabel = "Let's Try Again!";
+        gradeColor = "var(--pink-dark)";
+        gradeBg = "var(--pink-soft)";
+        speakingStars = 0;
+      }
+
+      // 產生具體且鼓勵性的學習回饋
+      let feedbackTips = [];
+      if (missingWords.length > 0) {
+        const displayMissing = missingWords.map(w => (w === "i" ? "I" : w));
+        if (missingWords.includes("an")) {
+          feedbackTips.push(`🔎 提醒：好像漏掉了關鍵字「an」（例如 an eraser），再念一次會更完整喔！`);
+        } else if (missingWords.includes("a")) {
+          feedbackTips.push(`🔎 提醒：好像漏掉了冠詞「a」，記得把句子念完整喔！`);
+        } else {
+          feedbackTips.push(`🔎 提醒：好像漏掉了單字「${displayMissing.join(", ")}」，試著把整句都念出來！`);
+        }
+      } else if (spokenWords.length < targetWords.length) {
+        feedbackTips.push(`🔎 提醒：好像只念出了部分句子，試著從頭到尾完整念一遍吧！`);
+      }
+
+      if (finalPercentScore >= 90) {
+        feedbackTips.unshift("🌟 太棒了！你的句子非常完整又清晰，繼續保持！");
+      } else if (finalPercentScore >= 80) {
+        feedbackTips.unshift("👏 念得很好喔！再多練習一次就能挑戰最高分！");
+      } else if (finalPercentScore >= 70) {
+        feedbackTips.unshift("👍 不錯喔！可以先按「聽示範發音」對照一下每個單字，再挑戰一次！");
+      } else if (finalPercentScore >= 60) {
+        feedbackTips.unshift("💪 已經念出大部分內容了，放慢速度把每個字念清楚，一定會更棒！");
+      } else {
+        feedbackTips.unshift("🌱 沒關係，先按「🔊 聽示範發音」跟著念一遍，再按「🎙️ 開始錄音」重新挑戰！");
+      }
+
+      return {
+        hasValidSpeech: true,
+        targetEn,
+        spokenRaw,
+        accuracyScore,
+        completenessScore,
+        fluencyAvailable,
+        fluencyScore,
+        fluencyText,
+        finalPercentScore,
+        isPartialAssessment,
+        gradeLabel,
+        gradeColor,
+        gradeBg,
+        speakingStars,
+        feedbackTips
+      };
+    }
+
+    function stopActiveRecognition(silent = true) {
+      recSessionToken += 1;
+      try {
+        if (activeRecognition) {
+          if (silent) {
+            activeRecognition.onresult = null;
+            activeRecognition.onerror = null;
+            activeRecognition.onend = null;
+            activeRecognition.onspeechstart = null;
+            activeRecognition.onspeechend = null;
+          }
+          activeRecognition.abort();
+          activeRecognition = null;
+        }
+      } catch (e) {
+        activeRecognition = null;
+      }
+    }
+
+    // 統一啟動語音辨識（供關卡口說練習與最終自我介紹舞台共用）
+    function beginSpeechSession({ targetEn, onInterim, onFinalEvaluated, onError, onStateChange }) {
+      stopActiveRecognition(true);
+
+      if (!isSpeechRecognitionSupported) {
+        onError("目前使用的瀏覽器不支援語音辨識，請改用支援的瀏覽器，或使用下方的自行練習模式。");
+        return;
+      }
+
+      const currentToken = ++recSessionToken;
+      let finalTranscript = "";
+      let latestInterim = "";
+      let speechStartTime = null;
+      let speechEndTime = null;
+      let hasSettled = false;
+
+      try {
+        const recognition = new SpeechRecognitionAPI();
+        activeRecognition = recognition;
+        recognition.lang = "en-US";
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function () {
+          if (currentToken !== recSessionToken) return;
+          onStateChange(true);
+        };
+
+        recognition.onspeechstart = function () {
+          if (currentToken !== recSessionToken) return;
+          speechStartTime = performance.now();
+        };
+
+        recognition.onspeechend = function () {
+          if (currentToken !== recSessionToken) return;
+          if (speechStartTime !== null) {
+            speechEndTime = performance.now();
+          }
+        };
+
+        recognition.onresult = function (event) {
+          if (currentToken !== recSessionToken) return;
+          let interim = "";
+          let finals = "";
+          for (let i = 0; i < event.results.length; i++) {
+            const res = event.results[i];
+            if (res.isFinal) {
+              finals += res[0].transcript + " ";
+            } else {
+              interim += res[0].transcript;
+            }
+          }
+          if (finals.trim()) {
+            finalTranscript = finals.trim();
+          }
+          latestInterim = interim.trim();
+          onInterim(finalTranscript || latestInterim);
+        };
+
+        recognition.onerror = function (event) {
+          if (currentToken !== recSessionToken || hasSettled) return;
+          hasSettled = true;
+          activeRecognition = null;
+          onStateChange(false);
+
+          let msg = "語音辨識失敗，請再試一次。";
+          if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            msg = "🚫 麥克風權限遭拒絕。請在瀏覽器網址列或系統設定中允許使用麥克風，然後再點一次「開始錄音」。";
+          } else if (event.error === "no-speech") {
+            msg = "🔇 沒有聽到聲音喔！請靠近麥克風大聲朗讀英文句子，再試一次。";
+          } else if (event.error === "audio-capture") {
+            msg = "🎙️ 找不到可用的麥克風裝置，請確認麥克風已連接後再試一次。";
+          } else if (event.error === "network") {
+            msg = "🌐 語音辨識連線暫時中斷，請確認網路連線後再試一次（或使用下方自行練習模式）。";
+          }
+          onError(msg);
+        };
+
+        recognition.onend = function () {
+          if (currentToken !== recSessionToken || hasSettled) return;
+          hasSettled = true;
+          activeRecognition = null;
+          onStateChange(false);
+
+          const rawText = (finalTranscript || latestInterim).trim();
+          if (!rawText) {
+            onError("🔇 沒有辨識到語音內容，請按下「🎙️ 開始錄音」並大聲朗讀句子再試一次。");
+            return;
+          }
+
+          let durationMs = null;
+          if (speechStartTime !== null) {
+            const endTs = speechEndTime !== null ? speechEndTime : performance.now();
+            durationMs = endTs - speechStartTime;
+          }
+
+          const evalResult = evaluateSpeakingAttempt(targetEn, rawText, durationMs);
+          if (!evalResult.hasValidSpeech) {
+            onError(evalResult.errorMessage);
+          } else {
+            onFinalEvaluated(evalResult);
+          }
+        };
+
+        recognition.start();
+      } catch (e) {
+        activeRecognition = null;
+        onStateChange(false);
+        onError("無法啟動麥克風語音辨識，請確認瀏覽器權限或使用下方的自行練習模式。");
+      }
+    }
+
+    function stopCurrentRecordingByUser() {
+      try {
+        if (activeRecognition) {
+          activeRecognition.stop();
+        }
+      } catch (e) {}
+    }
+
+    /* ==========================================================================
+       4. 遊戲狀態管理 (State Management)
+       ========================================================================== */
+    const state = {
+      screen: "locked", // locked | start | hub | mission | missionComplete | final | expired
+      avatar: "fox",
+      // 門禁與課堂限時存取控制 (預設鎖定，需掃描教師產生的限時 QR Code 才解鎖)
+      accessExpiresAt: null,
+      teacherPin: "1234",
+      teacherUnlocked: false,
+      teacherPinInput: "",
+      teacherPinError: "",
+      teacherModalTab: "qr", // qr | roster | settings
+      showTeacherModal: false,
+      teacherBaseUrl: "",
+      teacherDurationMin: 45,
+      teacherSingleUse: true,
+      teacherGeneratedUrl: "",
+      teacherCopiedMsg: false,
+      // 班級學生五碼登入與學習紀錄
+      strictRosterOnly: false,
+      studentCodeInput: "",
+      studentLoginError: "",
+      currentStudent: null, // { code: "30105", name: "王小明" }
+      rosterList: [], // [{ code: "30105", name: "王小明" }]
+      progressMap: {}, // { "30105": { ... } }
+      rosterFilterClass: "ALL",
+      newStudentCode: "",
+      newStudentName: "",
+      bulkRosterText: "",
+      rosterNoticeMsg: "",
+      // 原本 26 顆遊戲星星（完全保留原有計分邏輯）
+      stars: 0,
+      awardedKeys: {},
+      // 額外口說練習星星（與原本 26 顆遊戲星星分開計算）
+      speakingStarsTotal: 0,
+      speakingBestStarsByLine: {},
+      completedMissions: {
+        1: false,
+        2: false,
+        3: false,
+        4: false
+      },
+      missionStars: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0
+      },
+      currentMission: 1,
+      stepIndex: 0,
+      // 互動題暫存狀態
+      visitedCards: {},
+      matchState: { selectedLeft: null, matchedIds: [], errorPair: null },
+      boxOpened: false,
+      boxItemIndex: 0,
+      orderSlots: [null, null, null, null],
+      orderChecked: false,
+      shuffledOptions: null,
+      shuffledOptionStepKey: null,
+      shuffledRightPairs: null,
+      shuffledRightPairsKey: null,
+      shuffledDialogueLines: null,
+      shuffledDialogueKey: null,
+      questionAnswered: false,
+      lastAnswerCorrect: null,
+      selectedOptionIdx: null,
+      // 關卡內口說練習活動狀態
+      speakingLineIdx: 0,
+      speakingRecording: false,
+      speakingInterimText: "",
+      speakingErrorMsg: "",
+      speakingResultByLine: {},
+      speakingSelfPracticed: {},
+      // 最終自我介紹狀態
+      introName: "Amy",
+      introAge: "nine",
+      introItem: "book",
+      introStep: 0, // 0..4 逐句練習，5 全部顯示
+      introRecording: false,
+      introInterimText: "",
+      introErrorMsg: "",
+      introEvalResult: null,
+      introFinished: false
+    };
+
+    const DETECTIVES = [
+      { id: "fox", zh: "狐狸小偵探", en: "Fox Detective", gender: "male", voiceLabel: "男聲 AI" },
+      { id: "panda", zh: "熊貓小偵探", en: "Panda Detective", gender: "male", voiceLabel: "男聲 AI" },
+      { id: "cat", zh: "貓咪小偵探", en: "Cat Detective", gender: "female", voiceLabel: "女聲 AI" },
+      { id: "rabbit", zh: "兔子小偵探", en: "Rabbit Detective", gender: "female", voiceLabel: "女聲 AI" }
+    ];
+
+    const FRIEND_GENDER = {
+      Amy: "female",
+      Tom: "male",
+      Ben: "male"
+    };
+
+    // Fisher-Yates 隨機洗牌工具函式（防止學生背答案位置）
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    const BADGES = [
+      { id: 1, name: "Friendly Detective", zh: "友善小偵探", icon: "🤝" },
+      { id: 2, name: "Age Expert", zh: "年齡小達人", icon: "🎂" },
+      { id: 3, name: "Supply Finder", zh: "文具尋寶王", icon: "🎒" },
+      { id: 4, name: "English Star", zh: "英語對話之星", icon: "🌟" }
+    ];
+
+    const STATIONERY_LIST = [
+      { key: "book", word: "book", phrase: "a book", sentence: "It's a book.", zh: "書本（母音以外開頭，用 a）" },
+      { key: "pen", word: "pen", phrase: "a pen", sentence: "It's a pen.", zh: "原子筆（用 a）" },
+      { key: "pencil", word: "pencil", phrase: "a pencil", sentence: "It's a pencil.", zh: "鉛筆（用 a）" },
+      { key: "eraser", word: "eraser", phrase: "an eraser", sentence: "It's an eraser.", zh: "橡皮擦（e 開頭，要用 an！）" },
+      { key: "marker", word: "marker", phrase: "a marker", sentence: "It's a marker.", zh: "彩色筆／白板筆（用 a）" },
+      { key: "ruler", word: "ruler", phrase: "a ruler", sentence: "It's a ruler.", zh: "直尺（用 a）" }
+    ];
+
+    /* ==========================================================================
+       5. 四大任務題庫與循序漸進教學設計 (Missions 1 - 4)
+       ========================================================================== */
+    const MISSIONS = {
+      1: {
+        id: 1,
+        titleEn: "Mission 1｜All About Me",
+        titleZh: "認識新朋友",
+        descZh: "學會詢問姓名與自我介紹，認識校園裡的新夥伴！",
+        color: "var(--blue-soft)",
+        steps: [
+          {
+            type: "explore_characters",
+            badge: "活動一｜Meet the Characters 認識新朋友",
+            instructionZh: "請點擊下面每一位新朋友的卡片，聽聽男女聲不同聲線的自我介紹喔！",
+            characters: [
+              { name: "Amy", line: "Hello! My name is Amy." },
+              { name: "Tom", line: "Hi! I'm Tom." },
+              { name: "Ben", line: "Hello! My name is Ben." }
+            ]
+          },
+          {
+            type: "mcq",
+            id: "m1_q1",
+            badge: "活動二｜Answer the Question 回答問題",
+            instructionZh: "Amy 正在介紹自己。當別人問 What's your name? 時，她應該怎麼回答？",
+            visualType: "friend",
+            visualValue: "Amy",
+            promptEn: "What's your name?",
+            options: [
+              "My name is Amy.",
+              "I'm nine years old.",
+              "It's a book."
+            ],
+            correctIndex: 0,
+            hintZh: "What's your name? 是在問「你叫什麼名字？」，要用 My name is Amy. 回答喔！"
+          },
+          {
+            type: "mcq",
+            id: "m1_q2",
+            badge: "活動三｜Character Profile 人物資訊卡 (1/2)",
+            instructionZh: "請看這張人物資訊卡，選出正確的答案！",
+            visualType: "profile",
+            profile: { friend: "Amy", rows: [{ label: "Name", value: "Amy" }] },
+            promptEn: "What's her name?",
+            options: [
+              "Her name is Amy.",
+              "Her name is Tom.",
+              "Her name is Ben."
+            ],
+            correctIndex: 0,
+            hintZh: "資訊卡上寫著 Name: Amy，所以她的名字是 Amy（Her name is Amy.）。"
+          },
+          {
+            type: "mcq",
+            id: "m1_q3",
+            badge: "活動三｜Character Profile 人物資訊卡 (2/2)",
+            instructionZh: "除了 My name is Amy. 之外，哪一句也是 Amy 正確的自我介紹呢？",
+            visualType: "profile",
+            profile: { friend: "Amy", rows: [{ label: "Name", value: "Amy" }] },
+            promptEn: "Which sentence introduces Amy?",
+            options: [
+              "I'm Amy.",
+              "I'm eight.",
+              "It's a pen."
+            ],
+            correctIndex: 0,
+            hintZh: "太棒了！My name is Amy. 和 I'm Amy. 都可以用來介紹自己的名字喔！"
+          },
+          {
+            type: "match",
+            id: "m1_q4",
+            badge: "活動四｜Match the Question 問答配對",
+            instructionZh: "請先點選左邊的句子，再點選右邊最適合的回答完成配對！（記住：My name is... 和 I'm... 都可以介紹名字喔）",
+            pairs: [
+              { id: "p1", left: "What's your name?", right: "My name is Tom.", gender: "male" },
+              { id: "p2", left: "Say your name (Ben)", right: "I'm Ben.", gender: "male" },
+              { id: "p3", left: "Nice to meet you!", right: "Nice to meet you, too!", gender: "female" }
+            ]
+          },
+          {
+            type: "speaking_practice",
+            id: "m1_speak",
+            badge: "活動五｜Let's Speak! 麥克風口說練習挑戰",
+            instructionZh: "這是額外口說練習！先按「🔊 聽示範發音」，再按「🎙️ 開始錄音」大聲朗讀英文句子，看看你的估算練習分數吧！",
+            lines: [
+              { speaker: "Amy", gender: "female", en: "What's your name?", zh: "你叫什麼名字？" },
+              { speaker: "Amy", gender: "female", en: "My name is Amy.", zh: "我的名字是 Amy。" },
+              { speaker: "Tom", gender: "male", en: "I'm Tom.", zh: "我是 Tom。" }
+            ]
+          }
+        ]
+      },
+
+      2: {
+        id: 2,
+        titleEn: "Mission 2｜How Old Are You?",
+        titleZh: "你幾歲了？",
+        descZh: "看懂人物年齡資訊卡，練習詢問與回答年齡！",
+        color: "var(--yellow-soft)",
+        steps: [
+          {
+            type: "explore_ages",
+            badge: "活動一｜Meet My Friends 認識朋友的年齡",
+            instructionZh: "點擊每位朋友的卡片，看看他們幾歲並聽聽男聲與女聲的英語發音！",
+            friends: [
+              { name: "Amy", ageText: "Age: 9", line: "I'm nine years old." },
+              { name: "Tom", ageText: "Age: 8", line: "I'm eight years old." },
+              { name: "Ben", ageText: "Age: 10", line: "I'm ten years old." }
+            ]
+          },
+          {
+            type: "mcq",
+            id: "m2_q1",
+            badge: "活動二｜Read and Choose 看圖選年齡",
+            instructionZh: "看看 Amy 的年齡資訊卡，選出正確的回答！",
+            visualType: "profile",
+            profile: { friend: "Amy", rows: [{ label: "Name", value: "Amy" }, { label: "Age", value: "9" }] },
+            promptEn: "How old is Amy?",
+            options: [
+              "She's nine.",
+              "She's eight.",
+              "She's ten."
+            ],
+            correctIndex: 0,
+            hintZh: "Amy 的資訊卡寫著 Age: 9，9 的英文是 nine，所以選 She's nine."
+          },
+          {
+            type: "mcq",
+            id: "m2_q2",
+            badge: "活動三｜Question and Answer 年齡問答",
+            instructionZh: "Tom 今年 8 歲，當有人問他 How old are you? 時，他會怎麼回答？",
+            visualType: "profile",
+            profile: { friend: "Tom", rows: [{ label: "Name", value: "Tom" }, { label: "Age", value: "8" }] },
+            promptEn: "How old are you?",
+            voiceGender: "male",
+            options: [
+              "I'm eight years old.",
+              "My name is Tom.",
+              "It's a yellow pencil."
+            ],
+            correctIndex: 0,
+            hintZh: "How old are you? 是問「你幾歲？」，要用 I'm eight years old. 回答！"
+          },
+          {
+            type: "mcq",
+            id: "m2_q3",
+            badge: "活動四｜Information Challenge 資訊卡挑戰 (1/2)",
+            instructionZh: "觀察這位男生的資訊卡，回答問題：How old is he?",
+            visualType: "profile",
+            profile: { friend: "Ben", rows: [{ label: "Name", value: "Ben" }, { label: "Age", value: "10" }] },
+            promptEn: "How old is he?",
+            options: [
+              "He's ten years old.",
+              "He's eight years old.",
+              "His name is Ben."
+            ],
+            correctIndex: 0,
+            hintZh: "資訊卡上是男生 Ben（Age: 10），問幾歲要用 He's ten years old."
+          },
+          {
+            type: "mcq",
+            id: "m2_q4",
+            badge: "活動四｜Information Challenge 資訊卡挑戰 (2/2)",
+            instructionZh: "再看一次這位男生的資訊卡，這題問的是名字喔：What's his name?",
+            visualType: "profile",
+            profile: { friend: "Ben", rows: [{ label: "Name", value: "Ben" }, { label: "Age", value: "10" }] },
+            promptEn: "What's his name?",
+            options: [
+              "His name is Ben.",
+              "His name is Tom.",
+              "He's ten years old."
+            ],
+            correctIndex: 0,
+            hintZh: "這題問 What's his name?（他叫什麼名字？），所以要回答 His name is Ben."
+          },
+          {
+            type: "speaking_practice",
+            id: "m2_speak",
+            badge: "活動五｜Let's Speak! 年齡口說練習挑戰",
+            instructionZh: "聽聽看女生與男生怎麼問答年齡，按「🎙️ 開始錄音」大聲跟著唸出來，挑戰獲得口說練習星星！",
+            lines: [
+              { speaker: "Amy", gender: "female", en: "How old are you?", zh: "你幾歲？" },
+              { speaker: "Tom", gender: "male", en: "I'm eight years old.", zh: "我今年八歲。" },
+              { speaker: "Ben", gender: "male", en: "I'm ten years old.", zh: "我今年十歲。" }
+            ]
+          }
+        ]
+      },
+
+      3: {
+        id: 3,
+        titleEn: "Mission 3｜Mystery Box",
+        titleZh: "神祕文具箱",
+        descZh: "打開神祕箱找文具！從單字、a/an 到 What's this? / What's that? 完整句型大挑戰！",
+        color: "var(--mint-soft)",
+        steps: [
+          {
+            type: "mystery_box",
+            badge: "活動一｜What's Inside? 打開神祕文具箱",
+            instructionZh: "點擊下方的神祕箱子，把 6 種遺失的文具全部找出來並聽發音吧！"
+          },
+          {
+            type: "mcq",
+            id: "m3_q1",
+            badge: "活動二｜Look and Choose 看圖辨認單字 (Level 1)",
+            instructionZh: "看看圖片裡的物品，選出正確的英文單字！",
+            visualType: "stationery",
+            visualValue: "book",
+            promptEn: "What's this?",
+            options: [
+              "book",
+              "pen",
+              "ruler"
+            ],
+            correctIndex: 0,
+            hintZh: "圖片是一本藍色的書，英文單字是 book。"
+          },
+          {
+            type: "mcq",
+            id: "m3_q2",
+            badge: "活動三｜Add a or an 加上冠詞 (Level 2)",
+            instructionZh: "仔細看這張橡皮擦圖片，前面應該用 a 還是 an 呢？",
+            visualType: "stationery",
+            visualValue: "eraser",
+            promptEn: "What is this?",
+            options: [
+              "an eraser",
+              "a eraser",
+              "a marker"
+            ],
+            correctIndex: 0,
+            hintZh: "重要規則：eraser 的第一個字母是母音 e，所以前面必須用 an（an eraser）！"
+          },
+          {
+            type: "mcq",
+            id: "m3_q3",
+            badge: "活動四｜Complete the Sentence 完成完整句子 (Level 3)",
+            instructionZh: "看圖片並回答問題：What's this?",
+            visualType: "stationery",
+            visualValue: "pencil",
+            promptEn: "What's this?",
+            options: [
+              "It's a pencil.",
+              "It's an eraser.",
+              "It's a ruler."
+            ],
+            correctIndex: 0,
+            hintZh: "圖片是一支黃色鉛筆（pencil），完整句子是 It's a pencil."
+          },
+          {
+            type: "mcq",
+            id: "m3_q4",
+            badge: "活動五｜What's This or That? 遠近情境 (1/2 - 靠近)",
+            instructionZh: "小偵探指著「靠近手邊」的物品問：What's this? 請選出正確回答！",
+            visualType: "near_far",
+            nearItem: "pen",
+            farItem: "ruler",
+            target: "this",
+            promptEn: "What's this?",
+            options: [
+              "It's a pen.",
+              "It's a ruler.",
+              "It's a book."
+            ],
+            correctIndex: 0,
+            hintZh: "靠近手邊（NEAR）的物品是原子筆，問 What's this? 要回答 It's a pen."
+          },
+          {
+            type: "mcq",
+            id: "m3_q5",
+            badge: "活動五｜What's This or That? 遠近情境 (2/2 - 遠處)",
+            instructionZh: "小偵探指著「教室遠處」的物品問：What's that? 請選出正確回答！",
+            visualType: "near_far",
+            nearItem: "book",
+            farItem: "marker",
+            target: "that",
+            promptEn: "What's that?",
+            options: [
+              "It's a marker.",
+              "It's a book.",
+              "It's a pencil."
+            ],
+            correctIndex: 0,
+            hintZh: "教室遠處（FAR）桌上的物品是彩色筆／白板筆，問 What's that? 要回答 It's a marker."
+          },
+          {
+            type: "speaking_practice",
+            id: "m3_speak",
+            badge: "活動六｜Let's Speak! 課本句型口說練習挑戰",
+            instructionZh: "大聲練習課本最重要的文具問答句型（特別注意 an eraser 的 an 喔！）",
+            lines: [
+              { speaker: "Amy", gender: "female", en: "It's an eraser.", zh: "這是一個橡皮擦。" },
+              { speaker: "Ben", gender: "male", en: "What's that? It's a marker.", zh: "那是什麼？那是一支彩色筆。" },
+              { speaker: "Amy", gender: "female", en: "What is this? It's a book.", zh: "這是什麼？這是一本書。" }
+            ]
+          }
+        ]
+      },
+
+      4: {
+        id: 4,
+        titleEn: "Mission 4｜Let's Talk!",
+        titleZh: "一起來對話",
+        descZh: "整合姓名、年齡與文具句型，完成對話排序、情境對話與口說挑戰！",
+        color: "var(--pink-soft)",
+        steps: [
+          {
+            type: "mcq",
+            id: "m4_q1",
+            badge: "活動一｜Read the Profile 閱讀完整資訊卡 (1/2)",
+            instructionZh: "閱讀 Amy 的完整資訊卡，回答問題：How old is she?",
+            visualType: "full_profile",
+            profile: {
+              friend: "Amy",
+              rows: [
+                { label: "Name", value: "Amy" },
+                { label: "Age", value: "9" },
+                { label: "Favorite item", value: "Book" }
+              ],
+              item: "book"
+            },
+            promptEn: "How old is she?",
+            options: [
+              "She's nine years old.",
+              "She's ten years old.",
+              "Her name is Amy."
+            ],
+            correctIndex: 0,
+            hintZh: "資訊卡上寫著 Age: 9，所以她今年 9 歲（She's nine years old.）。"
+          },
+          {
+            type: "mcq",
+            id: "m4_q2",
+            badge: "活動一｜Read the Profile 閱讀完整資訊卡 (2/2)",
+            instructionZh: "繼續看 Amy 的資訊卡，回答問題：What's her favorite school item?",
+            visualType: "full_profile",
+            profile: {
+              friend: "Amy",
+              rows: [
+                { label: "Name", value: "Amy" },
+                { label: "Age", value: "9" },
+                { label: "Favorite item", value: "Book" }
+              ],
+              item: "book"
+            },
+            promptEn: "What's her favorite school item?",
+            options: [
+              "It's a book.",
+              "It's a ruler.",
+              "It's an eraser."
+            ],
+            correctIndex: 0,
+            hintZh: "資訊卡上 Favorite item 寫著 Book，旁邊也有書本圖片，所以答案是 It's a book."
+          },
+          {
+            type: "order_dialogue",
+            id: "m4_q3",
+            badge: "活動二｜Put the Dialogue in Order 對話排排看",
+            instructionZh: "請依序「點擊」下方的英文句子，把它們排成合理的 4 句對話順序！（點上方空格可取消重選）",
+            correctLines: [
+              "What's your name?",
+              "My name is Tom.",
+              "How old are you?",
+              "I'm nine years old."
+            ],
+            shuffledLines: [
+              "I'm nine years old.",
+              "What's your name?",
+              "How old are you?",
+              "My name is Tom."
+            ],
+            zhMeaning: "中文意思：你叫什麼名字？→ 我叫 Tom。→ 你幾歲？→ 我九歲。"
+          },
+          {
+            type: "mcq",
+            id: "m4_q4",
+            badge: "活動三｜Choose the Best Reply 選出最適合的回應",
+            instructionZh: "看看情境對話中 A 問了什麼問題，幫 B 選出最合理的回答！",
+            visualType: "dialogue_bubble",
+            speakerA: "A: What's that?",
+            item: "ruler",
+            promptEn: "B: ______.",
+            options: [
+              "It's a ruler.",
+              "My name is Amy.",
+              "I'm nine years old."
+            ],
+            correctIndex: 0,
+            hintZh: "A 指著遠處的直尺問 What's that?（那是什麼？），B 要回答物品名稱 It's a ruler."
+          },
+          {
+            type: "mcq",
+            id: "m4_q5",
+            badge: "活動四｜Mini Conversation 情境對話填空 (1/2)",
+            instructionZh: "閱讀小偵探與 Ben 的對話，幫第 1 個空格選出正確回答！",
+            visualType: "mini_chat",
+            chatStep: 1,
+            promptEn: "完成對話空格 [ 1 ]：",
+            options: [
+              "My name is Ben.",
+              "I'm ten years old.",
+              "It's an eraser."
+            ],
+            correctIndex: 0,
+            hintZh: "第一句問 Hello! What's your name?，所以 Ben 要先介紹名字 My name is Ben."
+          },
+          {
+            type: "mcq",
+            id: "m4_q6",
+            badge: "活動四｜Mini Conversation 情境對話填空 (2/2)",
+            instructionZh: "對話繼續進行！小偵探拿出橡皮擦問 What's this?，幫第 2 個空格選出正確回答！",
+            visualType: "mini_chat",
+            chatStep: 2,
+            promptEn: "完成對話空格 [ 2 ]：",
+            options: [
+              "It's an eraser.",
+              "It's a eraser.",
+              "I'm ten years old."
+            ],
+            correctIndex: 0,
+            hintZh: "橡皮擦是 eraser（母音開頭），問 What's this? 要回答 It's an eraser."
+          },
+          {
+            type: "speaking_practice",
+            id: "m4_speak",
+            badge: "活動五｜Let's Speak! 雙人對話角色扮演口說挑戰",
+            instructionZh: "挑戰完整雙人對話口說！分別聽聽女生與男生的語氣，按「🎙️ 開始錄音」大聲跟著唸出來！",
+            lines: [
+              { speaker: "Amy", gender: "female", en: "Hello! What's your name?", zh: "你好！你叫什麼名字？" },
+              { speaker: "Ben", gender: "male", en: "My name is Ben. I'm ten years old.", zh: "我叫 Ben，我今年十歲。" },
+              { speaker: "Amy", gender: "female", en: "What's that? It's a ruler.", zh: "那是什麼？那是一把直尺。" }
+            ]
+          }
+        ]
+      }
+    };
+
+    /* ==========================================================================
+       6. 畫面渲染核心 (Render Engine)
+       ========================================================================== */
+    function render() {
+      updateTopbar();
+      const app = document.getElementById("app");
+
+      if (state.screen === "locked" || state.screen === "expired") {
+        app.innerHTML = renderLockedOrExpiredScreen(state.screen === "expired");
+      } else if (state.screen === "start") {
+        app.innerHTML = renderStartScreen();
+      } else if (state.screen === "hub") {
+        app.innerHTML = renderHubScreen();
+      } else if (state.screen === "mission") {
+        app.innerHTML = renderMissionScreen();
+      } else if (state.screen === "missionComplete") {
+        app.innerHTML = renderMissionCompleteScreen();
+      } else if (state.screen === "final") {
+        app.innerHTML = renderFinalIntroScreen();
+      }
+      renderTeacherModal();
+    }
+
+    function updateTopbar() {
+      document.getElementById("starCounter").textContent = `⭐ ${state.stars} / 26`;
+      document.getElementById("speakingStarCounter").textContent = `🎙️ 口說星：${state.speakingStarsTotal}`;
+      const hubBtn = document.getElementById("btnHubNav");
+      const studentPill = document.getElementById("studentBadgePill");
+
+      if (state.currentStudent && state.screen !== "locked" && state.screen !== "expired") {
+        studentPill.classList.remove("hidden");
+        const classLabel = formatFiveDigitClassSeat(state.currentStudent.code);
+        studentPill.textContent = `🎒 ${state.currentStudent.code} (${classLabel})${state.currentStudent.name ? " " + state.currentStudent.name : ""}`;
+      } else {
+        studentPill.classList.add("hidden");
+      }
+
+      if (state.screen === "start" || state.screen === "locked" || state.screen === "expired") {
+        hubBtn.classList.add("hidden");
+      } else {
+        hubBtn.classList.remove("hidden");
+      }
+      updateClassTimerUI();
+    }
+
+    // 解析五碼學號（例如 30105 -> 301班 05號）
+    function formatFiveDigitClassSeat(code) {
+      if (!/^\d{5}$/.test(code)) return code;
+      const cls = code.slice(0, 3);
+      const seat = code.slice(3, 5);
+      return `${cls}班${seat}號`;
+    }
+
+    // --------------------------------------------------------------------------
+    // 預設門禁鎖定 ＋ 課堂限時 QR Code 入口產生器 ＋ 班級名單與成績系統
+    // --------------------------------------------------------------------------
+    let classTimerInterval = null;
+    const usedSessionTokens = new Set();
+
+    function initAccessControlFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const expParam = params.get("exp");
+      const tokenParam = params.get("tid");
+
+      // 預設填入目前頁面乾淨網址（去除舊查詢參數）
+      const cleanUrl = window.location.origin && window.location.origin !== "null"
+        ? `${window.location.origin}${window.location.pathname}`
+        : window.location.href.split("?")[0];
+      state.teacherBaseUrl = cleanUrl.startsWith("http") ? cleanUrl : "";
+
+      // 預設一律鎖定（平板直接開瀏覽器、點書籤或歷史紀錄都無法進入）
+      if (!expParam) {
+        state.accessExpiresAt = null;
+        state.screen = "locked";
+        return;
+      }
+
+      const expMs = parseInt(expParam, 10);
+      if (isNaN(expMs) || Date.now() > expMs) {
+        state.screen = "expired";
+        return;
+      }
+
+      // 若開啟嚴格模式（tid 參數存在），同分頁重整或重新開啟即判定失效
+      if (tokenParam) {
+        if (usedSessionTokens.has(tokenParam)) {
+          state.screen = "expired";
+          return;
+        }
+        usedSessionTokens.add(tokenParam);
+        // 清除網址列上的 tid，避免學生重新整理或複製網址重開
+        try {
+          const cleanDisplayUrl = `${window.location.pathname}?exp=${expMs}&used=1`;
+          window.history.replaceState({}, "", cleanDisplayUrl);
+        } catch (e) {}
+      }
+
+      if (params.get("used") === "1") {
+        state.screen = "expired";
+        return;
+      }
+
+      state.accessExpiresAt = expMs;
+      state.screen = "start";
+      startClassCountdownTimer();
+    }
+
+    function startClassCountdownTimer() {
+      if (classTimerInterval) clearInterval(classTimerInterval);
+      classTimerInterval = setInterval(() => {
+        if (!state.accessExpiresAt) return;
+        const remainMs = state.accessExpiresAt - Date.now();
+        if (remainMs <= 0) {
+          clearInterval(classTimerInterval);
+          stopActiveRecognition(true);
+          state.currentStudent = null;
+          state.screen = "expired";
+          render();
+        } else {
+          updateClassTimerUI();
+        }
+      }, 1000);
+    }
+
+    function updateClassTimerUI() {
+      const pill = document.getElementById("classTimerPill");
+      if (!pill) return;
+      if (!state.accessExpiresAt || state.screen === "locked" || state.screen === "expired") {
+        pill.classList.add("hidden");
+        return;
+      }
+      pill.classList.remove("hidden");
+      const remainSec = Math.max(0, Math.floor((state.accessExpiresAt - Date.now()) / 1000));
+      const mins = String(Math.floor(remainSec / 60)).padStart(2, "0");
+      const secs = String(remainSec % 60).padStart(2, "0");
+      pill.textContent = `⏳ 剩餘 ${mins}:${secs}`;
+      if (remainSec <= 180) {
+        pill.className = "timer-pill warning";
+      } else {
+        pill.className = "timer-pill";
+      }
+    }
+
+    function openTeacherModal() {
+      playTone("click");
+      state.showTeacherModal = true;
+      state.teacherPinError = "";
+      state.teacherCopiedMsg = false;
+      generateTimedQRUrl();
+      renderTeacherModal();
+    }
+
+    function closeTeacherModal() {
+      playTone("click");
+      state.showTeacherModal = false;
+      renderTeacherModal();
+    }
+
+    function verifyTeacherPin() {
+      const entered = (state.teacherPinInput || "").trim();
+      if (entered === state.teacherPin) {
+        playTone("correct");
+        state.teacherUnlocked = true;
+        state.teacherPinError = "";
+        state.teacherPinInput = "";
+        generateTimedQRUrl();
+      } else {
+        playTone("wrong");
+        state.teacherPinError = "❌ 密碼錯誤，請重新輸入教師密碼（預設為 1234）";
+      }
+      renderTeacherModal();
+    }
+
+    function unlockPreviewForTeacherTest() {
+      playTone("correct");
+      state.accessExpiresAt = Date.now() + 60 * 60 * 1000;
+      state.showTeacherModal = false;
+      state.screen = "start";
+      startClassCountdownTimer();
+      render();
+    }
+
+    function setTeacherModalTab(tab) {
+      playTone("click");
+      state.teacherModalTab = tab;
+      state.rosterNoticeMsg = "";
+      renderTeacherModal();
+    }
+
+    function setTeacherBaseUrl(val) {
+      state.teacherBaseUrl = val.trim();
+      state.teacherCopiedMsg = false;
+      generateTimedQRUrl();
+      renderTeacherModal();
+    }
+
+    function setTeacherDuration(min) {
+      playTone("click");
+      state.teacherDurationMin = min;
+      state.teacherCopiedMsg = false;
+      generateTimedQRUrl();
+      renderTeacherModal();
+    }
+
+    function toggleTeacherSingleUse(checked) {
+      playTone("click");
+      state.teacherSingleUse = checked;
+      state.teacherCopiedMsg = false;
+      generateTimedQRUrl();
+      renderTeacherModal();
+    }
+
+    function generateTimedQRUrl() {
+      const base = (state.teacherBaseUrl || "").trim();
+      if (!base) {
+        state.teacherGeneratedUrl = "";
+        return;
+      }
+      try {
+        const urlObj = new URL(base);
+        const expTimestamp = Date.now() + state.teacherDurationMin * 60 * 1000;
+        urlObj.searchParams.set("exp", String(expTimestamp));
+        urlObj.searchParams.delete("used");
+        if (state.teacherSingleUse) {
+          const randomToken = Math.random().toString(36).substring(2, 9);
+          urlObj.searchParams.set("tid", randomToken);
+        } else {
+          urlObj.searchParams.delete("tid");
+        }
+        state.teacherGeneratedUrl = urlObj.toString();
+      } catch (e) {
+        state.teacherGeneratedUrl = "";
+      }
+    }
+
+    function copyGeneratedUrl() {
+      if (!state.teacherGeneratedUrl) return;
+      const tempInput = document.createElement("input");
+      tempInput.value = state.teacherGeneratedUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      playTone("correct");
+      state.teacherCopiedMsg = true;
+      renderTeacherModal();
+    }
+
+    // 班級學生資料建立與管理
+    async function addSingleStudentToRoster() {
+      const code = (state.newStudentCode || "").trim();
+      const name = (state.newStudentName || "").trim();
+      if (!/^\d{5}$/.test(code)) {
+        playTone("wrong");
+        state.rosterNoticeMsg = "⚠️ 班級座號必須為 5 碼數字（例如 3 年 1 班 5 號請輸入 30105）";
+        renderTeacherModal();
+        return;
+      }
+      playTone("correct");
+      const existingIdx = state.rosterList.findIndex(s => s.code === code);
+      if (existingIdx !== -1) {
+        state.rosterList[existingIdx].name = name;
+      } else {
+        state.rosterList.push({ code, name });
+        state.rosterList.sort((a, b) => a.code.localeCompare(b.code));
+      }
+      state.newStudentCode = "";
+      state.newStudentName = "";
+      state.rosterNoticeMsg = `✅ 已新增／更新學生：${code} ${name}`;
+      if (window.CloudSync) {
+        await window.CloudSync.upsertStudentRoster(code, name);
+      }
+      renderTeacherModal();
+    }
+
+    async function importBulkRoster() {
+      const raw = (state.bulkRosterText || "").trim();
+      if (!raw) return;
+      const lines = raw.split(/\r?\n/);
+      let addedCount = 0;
+      for (const line of lines) {
+        const clean = line.trim();
+        if (!clean) continue;
+        const match = clean.match(/^(\d{5})[\s,，\t-]*(.*)$/);
+        if (match) {
+          const code = match[1];
+          const name = (match[2] || "").trim();
+          const idx = state.rosterList.findIndex(s => s.code === code);
+          if (idx !== -1) {
+            state.rosterList[idx].name = name;
+          } else {
+            state.rosterList.push({ code, name });
+          }
+          if (window.CloudSync) {
+            await window.CloudSync.upsertStudentRoster(code, name);
+          }
+          addedCount += 1;
+        }
+      }
+      state.rosterList.sort((a, b) => a.code.localeCompare(b.code));
+      if (addedCount > 0) {
+        playTone("correct");
+        state.bulkRosterText = "";
+        state.rosterNoticeMsg = `✅ 成功匯入 ${addedCount} 筆學生資料！`;
+      } else {
+        playTone("wrong");
+        state.rosterNoticeMsg = "⚠️ 找不到符合格式的資料，請確認每行開頭為 5 碼數字（例如：30101 王小明）";
+      }
+      renderTeacherModal();
+    }
+
+    async function deleteStudentFromRoster(code) {
+      playTone("click");
+      state.rosterList = state.rosterList.filter(s => s.code !== code);
+      if (window.CloudSync) {
+        await window.CloudSync.removeStudentRoster(code);
+      }
+      renderTeacherModal();
+    }
+
+    async function saveTeacherSecuritySettings() {
+      const newPinInput = document.getElementById("teacherNewPinInput");
+      const strictCheckbox = document.getElementById("teacherStrictRosterCheckbox");
+      const newPin = newPinInput ? newPinInput.value.trim() : state.teacherPin;
+      const strictVal = strictCheckbox ? strictCheckbox.checked : state.strictRosterOnly;
+
+      if (newPin.length < 4) {
+        playTone("wrong");
+        state.rosterNoticeMsg = "⚠️ 教師密碼至少需要 4 個字元！";
+        renderTeacherModal();
+        return;
+      }
+      playTone("correct");
+      state.teacherPin = newPin;
+      state.strictRosterOnly = strictVal;
+      state.rosterNoticeMsg = "✅ 已儲存教師密碼與名單驗證設定！";
+      if (window.CloudSync) {
+        await window.CloudSync.saveTeacherSettings(newPin, strictVal);
+      }
+      renderTeacherModal();
+    }
+
+    function exportProgressCSV() {
+      playTone("correct");
+      const allCodesSet = new Set([
+        ...state.rosterList.map(r => r.code),
+        ...Object.keys(state.progressMap)
+      ]);
+      const sortedCodes = Array.from(allCodesSet).sort();
+
+      const rows = [
+        ["五碼學號", "班級座號", "學生姓名", "遊戲星星(滿分26)", "口說練習星", "任務1", "任務2", "任務3", "任務4", "自我介紹舞台", "最後更新時間"]
+      ];
+
+      sortedCodes.forEach(code => {
+        const rosterItem = state.rosterList.find(r => r.code === code);
+        const prog = state.progressMap[code] || {};
+        const name = prog.name || (rosterItem ? rosterItem.name : "");
+        const stars = prog.stars || 0;
+        const spStars = prog.speakingStarsTotal || 0;
+        const cm = prog.completedMissions || {};
+        const timeStr = prog.updatedAt
+          ? new Date(prog.updatedAt).toLocaleString("zh-TW", { hour12: false })
+          : "尚未登入";
+
+        rows.push([
+          code,
+          formatFiveDigitClassSeat(code),
+          name,
+          stars,
+          spStars,
+          cm[1] ? "完成" : "未完成",
+          cm[2] ? "完成" : "未完成",
+          cm[3] ? "完成" : "未完成",
+          cm[4] ? "完成" : "未完成",
+          prog.introFinished ? "完成" : "未完成",
+          timeStr
+        ]);
+      });
+
+      const csvContent = "\uFEFF" + rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Stationery_Detective_學習紀錄_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // 同步目前登入學生的學習進度到雲端
+    function syncCurrentStudentProgressToCloud() {
+      if (!state.currentStudent || !state.currentStudent.code) return;
+      const code = state.currentStudent.code;
+      const payload = {
+        code,
+        name: state.currentStudent.name || "",
+        avatar: state.avatar,
+        stars: state.stars,
+        awardedKeys: state.awardedKeys,
+        speakingStarsTotal: state.speakingStarsTotal,
+        speakingBestStarsByLine: state.speakingBestStarsByLine,
+        completedMissions: state.completedMissions,
+        missionStars: state.missionStars,
+        introFinished: state.introFinished,
+        updatedAt: Date.now()
+      };
+      state.progressMap[code] = payload;
+      if (window.CloudSync) {
+        window.CloudSync.saveStudentProgress(payload);
+      }
+    }
+
+    function renderTeacherModal() {
+      const root = document.getElementById("teacherModalRoot");
+      if (!root) return;
+      if (!state.showTeacherModal) {
+        root.innerHTML = "";
+        return;
+      }
+
+      // 尚未輸入教師密碼解鎖前，顯示密碼驗證畫面
+      if (!state.teacherUnlocked) {
+        root.innerHTML = `
+          <div class="teacher-modal-backdrop" onclick="if(event.target===this) closeTeacherModal()">
+            <div class="teacher-modal" style="max-width:420px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0; font-size:1.2rem; color:var(--blue-dark);">🔐 教師管理後台驗證</h3>
+                <button class="nav-btn" style="min-height:36px; padding:4px 12px;" onclick="closeTeacherModal()">✕</button>
+              </div>
+              <p style="font-size:0.95rem; color:var(--text-muted); font-weight:700; margin:12px 0;">
+                請輸入教師管理密碼以派發課堂 QR Code、建立班級學生名單或檢視全班學習紀錄（預設密碼：<code>1234</code>）：
+              </p>
+              <input type="password" value="${state.teacherPinInput}"
+                placeholder="請輸入教師密碼"
+                oninput="state.teacherPinInput=this.value"
+                onkeydown="if(event.key==='Enter') verifyTeacherPin()"
+                style="width:200px; padding:10px 14px; border:3px solid var(--blue-main); border-radius:14px; font-size:1.25rem; font-weight:900; text-align:center;" />
+              ${state.teacherPinError ? `<div class="feedback-box error-alert" style="margin-top:10px;">${state.teacherPinError}</div>` : ""}
+              <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
+                <button class="btn btn-primary" onclick="verifyTeacherPin()">🔓 解鎖進入後台</button>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const durations = [15, 30, 40, 45, 60];
+      const qrImgSrc = state.teacherGeneratedUrl
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(state.teacherGeneratedUrl)}`
+        : "";
+      const expireTimeStr = new Date(Date.now() + state.teacherDurationMin * 60 * 1000)
+        .toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+
+      // 整理班級列表供篩選
+      const allCodesSet = new Set([
+        ...state.rosterList.map(r => r.code),
+        ...Object.keys(state.progressMap)
+      ]);
+      const allCodes = Array.from(allCodesSet).sort();
+      const classSet = new Set(allCodes.map(c => c.slice(0, 3)));
+      const classList = Array.from(classSet).sort();
+      const filteredCodes = state.rosterFilterClass === "ALL"
+        ? allCodes
+        : allCodes.filter(c => c.startsWith(state.rosterFilterClass));
+
+      let tabBodyHtml = "";
+
+      if (state.teacherModalTab === "qr") {
+        tabBodyHtml = `
+          <p style="font-size:0.92rem; color:var(--text-muted); font-weight:700; text-align:left; line-height:1.5; margin:6px 0 10px;">
+            平時平板直接打開瀏覽器一律為「門禁鎖定狀態」。只有學生拿平板掃描下方產生的專屬 QR Code 才能進入；<strong>下課時間一到或關閉頁面即自動重新上鎖</strong>！
+          </p>
+
+          <div style="text-align:left; margin-bottom:10px;">
+            <label style="font-size:0.88rem; font-weight:800; color:var(--blue-dark); display:block; margin-bottom:4px;">
+              1. 網站公開網址（Google 協作平台發佈後的公開網址）：
+            </label>
+            <input type="text" value="${state.teacherBaseUrl}"
+              placeholder="請貼上 https://sites.google.com/view/..."
+              oninput="setTeacherBaseUrl(this.value)"
+              style="width:100%; padding:10px 12px; border:2px solid var(--blue-main); border-radius:12px; font-size:0.92rem; font-weight:700;" />
+          </div>
+
+          <div style="text-align:left; margin-bottom:10px;">
+            <div style="font-size:0.88rem; font-weight:800; color:var(--blue-dark); margin-bottom:6px;">
+              2. 設定有效時間（預計於 <strong>${expireTimeStr}</strong> 自動過期上鎖）：
+            </div>
+            <div class="chip-group" style="justify-content:flex-start; margin:0;">
+              ${durations.map(m => `
+                <button class="chip-btn ${state.teacherDurationMin === m ? "active" : ""}"
+                  style="min-height:38px; padding:6px 12px; font-size:0.9rem;"
+                  onclick="setTeacherDuration(${m})">${m} 分鐘</button>
+              `).join("")}
+            </div>
+          </div>
+
+          <label style="display:flex; align-items:center; gap:8px; text-align:left; font-size:0.9rem; font-weight:800; color:var(--text-main); background:var(--yellow-soft); padding:10px 12px; border-radius:12px; cursor:pointer;">
+            <input type="checkbox" ${state.teacherSingleUse ? "checked" : ""} onchange="toggleTeacherSingleUse(this.checked)" style="width:18px; height:18px;" />
+            <span>🔒 嚴格單次防殘留：學生關閉分頁或重新整理瀏覽器即立刻重新上鎖</span>
+          </label>
+
+          ${qrImgSrc ? `
+            <div class="qr-preview-box">
+              <img src="${qrImgSrc}" alt="課堂限時 QR Code" />
+              <div style="font-size:0.86rem; font-weight:800; color:var(--mint-dark);">
+                ✅ 投影給學生拿平板掃描即可解鎖進入（將於 ${expireTimeStr} 準時關閉）
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                <button class="btn btn-primary" style="min-height:44px; padding:8px 16px; font-size:0.95rem;" onclick="copyGeneratedUrl()">
+                  📋 複製限時網址
+                </button>
+                <button class="btn btn-mint" style="min-height:44px; padding:8px 16px; font-size:0.95rem;" onclick="unlockPreviewForTeacherTest()">
+                  🧪 老師本機直接解鎖測試
+                </button>
+              </div>
+              ${state.teacherCopiedMsg ? `<div style="font-size:0.88rem; font-weight:800; color:var(--mint-dark);">已複製限時連結到剪貼簿！</div>` : ""}
+            </div>
+          ` : `
+            <div class="feedback-box retry" style="margin-top:12px;">
+              請在上方輸入框貼上您的完整 <code>https://</code> 網址，即可立即產生限時 QR Code！
+              <div style="margin-top:8px;">
+                <button class="btn btn-mint" style="min-height:42px; padding:6px 14px; font-size:0.9rem;" onclick="unlockPreviewForTeacherTest()">
+                  🧪 老師本機直接解鎖測試網站
+                </button>
+              </div>
+            </div>
+          `}
+        `;
+      } else if (state.teacherModalTab === "roster") {
+        tabBodyHtml = `
+          <div style="text-align:left;">
+            <div style="background:#f4f9ff; border:2px solid #cbe0fa; border-radius:16px; padding:12px; margin-bottom:12px;">
+              <div style="font-weight:800; color:var(--blue-dark); margin-bottom:6px;">➕ 新增單筆學生（五碼班級座號，如 30105）：</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <input type="text" maxlength="5" value="${state.newStudentCode}" placeholder="五碼學號 (如 30105)"
+                  oninput="state.newStudentCode=this.value"
+                  style="width:165px; padding:8px 12px; border:2px solid var(--blue-main); border-radius:10px; font-weight:800;" />
+                <input type="text" maxlength="12" value="${state.newStudentName}" placeholder="姓名 (選填，如 王小明)"
+                  oninput="state.newStudentName=this.value"
+                  style="width:165px; padding:8px 12px; border:2px solid var(--blue-main); border-radius:10px; font-weight:800;" />
+                <button class="btn btn-primary" style="min-height:42px; padding:6px 16px; font-size:0.92rem;" onclick="addSingleStudentToRoster()">
+                  新增學生
+                </button>
+              </div>
+
+              <details style="margin-top:10px;">
+                <summary style="cursor:pointer; font-weight:800; color:var(--purple-main); font-size:0.9rem;">
+                  📋 整批匯入班級名單（從 Excel 複製貼上）
+                </summary>
+                <div style="margin-top:8px;">
+                  <textarea rows="4" placeholder="每行一筆，格式：五碼學號 姓名&#10;例如：&#10;30101 王小明&#10;30102 陳小華&#10;30103 林小美"
+                    oninput="state.bulkRosterText=this.value"
+                    style="width:100%; padding:8px; border:2px solid var(--blue-main); border-radius:10px; font-size:0.9rem;">${state.bulkRosterText}</textarea>
+                  <button class="btn btn-mint" style="min-height:40px; padding:6px 14px; font-size:0.9rem; margin-top:6px;" onclick="importBulkRoster()">
+                    📥 批次匯入名單
+                  </button>
+                </div>
+              </details>
+            </div>
+
+            ${state.rosterNoticeMsg ? `<div class="feedback-box success" style="margin-bottom:10px; padding:8px 12px;">${state.rosterNoticeMsg}</div>` : ""}
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span style="font-weight:800; color:var(--blue-dark); font-size:0.92rem;">📊 全班學習紀錄（共 ${filteredCodes.length} 人）：</span>
+                <select onchange="state.rosterFilterClass=this.value; renderTeacherModal();"
+                  style="padding:5px 10px; border:2px solid var(--blue-main); border-radius:999px; font-weight:800; font-size:0.88rem;">
+                  <option value="ALL" ${state.rosterFilterClass === "ALL" ? "selected" : ""}>全部班級</option>
+                  ${classList.map(c => `<option value="${c}" ${state.rosterFilterClass === c ? "selected" : ""}>${c} 班</option>`).join("")}
+                </select>
+              </div>
+              <button class="btn btn-yellow" style="min-height:38px; padding:5px 14px; font-size:0.88rem;" onclick="exportProgressCSV()">
+                📥 匯出 CSV 成績單
+              </button>
+            </div>
+
+            <div class="roster-table-wrap">
+              <table class="roster-table">
+                <thead>
+                  <tr>
+                    <th>五碼學號</th>
+                    <th>姓名</th>
+                    <th>遊戲星</th>
+                    <th>口說星</th>
+                    <th>四大任務</th>
+                    <th>自我介紹</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filteredCodes.length === 0 ? `
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:16px;">目前尚無學生名單或登入紀錄</td></tr>
+                  ` : filteredCodes.map(code => {
+                    const rItem = state.rosterList.find(r => r.code === code);
+                    const prog = state.progressMap[code] || {};
+                    const name = prog.name || (rItem ? rItem.name : "-");
+                    const cm = prog.completedMissions || {};
+                    const doneCount = [1, 2, 3, 4].filter(id => cm[id]).length;
+                    return `
+                      <tr>
+                        <td><strong>${code}</strong><br/><span style="font-size:0.78rem; color:var(--text-muted);">${formatFiveDigitClassSeat(code)}</span></td>
+                        <td>${name || "-"}</td>
+                        <td style="color:var(--yellow-dark);">⭐ ${prog.stars || 0}/26</td>
+                        <td style="color:var(--pink-dark);">🎙️ ${prog.speakingStarsTotal || 0}</td>
+                        <td>${doneCount}/4 關</td>
+                        <td>${prog.introFinished ? "✅ 完成" : "—"}</td>
+                        <td>
+                          ${rItem ? `<button class="nav-btn" style="min-height:30px; padding:2px 8px; font-size:0.78rem; border-color:var(--pink-main); color:var(--pink-dark);" onclick="deleteStudentFromRoster('${code}')">刪除</button>` : `<span style="font-size:0.78rem; color:var(--text-muted);">自由登入</span>`}
+                        </td>
+                      </tr>
+                    `;
+                  }).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      } else {
+        tabBodyHtml = `
+          <div style="text-align:left; background:#f8fbff; border:2px solid var(--border-soft); border-radius:16px; padding:16px;">
+            <div style="margin-bottom:14px;">
+              <label style="font-weight:800; color:var(--blue-dark); display:block; margin-bottom:6px;">
+                🔑 修改教師管理後台密碼（至少 4 碼）：
+              </label>
+              <input id="teacherNewPinInput" type="text" maxlength="12" value="${state.teacherPin}"
+                style="width:180px; padding:8px 12px; border:2px solid var(--blue-main); border-radius:10px; font-weight:800; font-size:1rem;" />
+            </div>
+
+            <label style="display:flex; align-items:flex-start; gap:10px; background:var(--yellow-soft); padding:12px; border-radius:12px; cursor:pointer; margin-bottom:14px;">
+              <input id="teacherStrictRosterCheckbox" type="checkbox" ${state.strictRosterOnly ? "checked" : ""} style="width:20px; height:20px; margin-top:2px;" />
+              <div style="font-size:0.92rem; font-weight:800; color:var(--text-main); line-height:1.5;">
+                <span>僅允許「已建立名單內」的五碼學號登入</span><br/>
+                <span style="font-size:0.82rem; color:var(--text-muted); font-weight:700;">
+                  （若不勾選，任何輸入正確 5 碼數字的學生皆可登入並自動建立學習紀錄；勾選後可防止學生誤輸別人的座號）
+                </span>
+              </div>
+            </label>
+
+            ${state.rosterNoticeMsg ? `<div class="feedback-box success" style="margin-bottom:12px;">${state.rosterNoticeMsg}</div>` : ""}
+
+            <button class="btn btn-primary" onclick="saveTeacherSecuritySettings()">💾 儲存設定</button>
+          </div>
+        `;
+      }
+
+      root.innerHTML = `
+        <div class="teacher-modal-backdrop" onclick="if(event.target===this) closeTeacherModal()">
+          <div class="teacher-modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 style="margin:0; font-size:1.22rem; color:var(--blue-dark);">👩‍🏫 教師課堂與班級管理中心</h3>
+              <button class="nav-btn" style="min-height:36px; padding:4px 12px;" onclick="closeTeacherModal()">✕ 關閉</button>
+            </div>
+
+            <div class="modal-tabs">
+              <button class="modal-tab-btn ${state.teacherModalTab === "qr" ? "active" : ""}" onclick="setTeacherModalTab('qr')">
+                📱 1. 派發課堂限時 QR
+              </button>
+              <button class="modal-tab-btn ${state.teacherModalTab === "roster" ? "active" : ""}" onclick="setTeacherModalTab('roster')">
+                📋 2. 班級名單與學習紀錄
+              </button>
+              <button class="modal-tab-btn ${state.teacherModalTab === "settings" ? "active" : ""}" onclick="setTeacherModalTab('settings')">
+                ⚙️ 3. 密碼與門禁設定
+              </button>
+            </div>
+
+            ${tabBodyHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLockedOrExpiredScreen(isExpired) {
+      return `
+        <section class="card hero-banner" style="border-color:var(--pink-main); background:linear-gradient(135deg, #fff5f8 0%, #fffdf5 100%);">
+          <div style="font-size:3.6rem;">${isExpired ? "⏰🔒" : "🔒📱"}</div>
+          <h1 class="game-title" style="color:var(--pink-dark);">
+            ${isExpired ? "本堂課練習時間已結束" : "課堂門禁鎖定中"}
+          </h1>
+          <div class="game-subtitle">
+            ${isExpired ? "Class Time Is Over!" : "Please Scan the Classroom QR Code"}
+          </div>
+          <div class="story-box" style="border-color:var(--pink-main); background:#ffffff;">
+            ${isExpired
+              ? "這個課堂專屬 QR Code 已經超過有效時間（或已關閉重新整理）。<br/>請等待下一堂課老師投影新的 QR Code 再拿平板掃描進入喔！👋"
+              : "為了避免下課後誤用平板，本練習網站平時為鎖定狀態。<br/>請拿平板相機掃描<strong>老師在黑板上投影的本節課專屬 QR Code</strong> 即可解鎖進入！"}
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-outline" onclick="openTeacherModal()">
+              👩‍🏫 教師登入 / 派發課堂 QR Code
+            </button>
+          </div>
+        </section>
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 畫面 1：開始畫面 (五碼班級座號登入 ＋ 選擇偵探角色)
+    // --------------------------------------------------------------------------
+    function renderStartScreen() {
+      const cardsHtml = DETECTIVES.map(d => {
+        const isSelected = state.avatar === d.id;
+        return `
+          <div class="avatar-card ${isSelected ? "selected" : ""}" onclick="selectAvatar('${d.id}')">
+            ${getDetectiveSVG(d.id, 96)}
+            <div class="avatar-name-zh">${d.zh}</div>
+            <div class="avatar-name-en">${d.en}</div>
+            <div style="margin-top:6px;">
+              <span class="voice-tag ${d.gender}">${d.gender === "male" ? "👦" : "👧"} ${d.voiceLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const matchedRoster = /^\d{5}$/.test(state.studentCodeInput)
+        ? state.rosterList.find(r => r.code === state.studentCodeInput)
+        : null;
+
+      return `
+        <section class="card hero-banner">
+          <div style="font-size:2.2rem;">🎒✏️📏🧽</div>
+          <h1 class="game-title">Stationery Detective 2.0</h1>
+          <div class="game-subtitle">My Little School Life｜國小三年級互動式英語闖關</div>
+
+          <div class="student-id-box">
+            <div style="font-size:1.1rem; font-weight:900; color:var(--blue-dark); margin-bottom:6px;">
+              🪪 第一步：請輸入你的「五碼班級座號」登入
+            </div>
+            <div style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin-bottom:10px;">
+              （例如：3 年 1 班 5 號，請輸入 <strong>30105</strong>）
+            </div>
+            <input id="studentCodeInputEl" class="student-code-input" type="tel" inputmode="numeric" maxlength="5"
+              value="${state.studentCodeInput}"
+              placeholder="30105"
+              oninput="handleStudentCodeInput(this)" />
+            <div id="studentCodePreviewEl">
+              ${/^\d{5}$/.test(state.studentCodeInput) ? `
+                <div style="margin-top:8px; font-weight:800; color:var(--mint-dark); font-size:0.98rem;">
+                  ✅ ${formatFiveDigitClassSeat(state.studentCodeInput)} ${matchedRoster && matchedRoster.name ? `（${matchedRoster.name}）` : ""}
+                </div>
+              ` : ""}
+            </div>
+            <div id="studentLoginErrorEl">
+              ${state.studentLoginError ? `
+                <div class="feedback-box error-alert" style="margin-top:10px; padding:8px 12px; font-size:0.92rem;">
+                  ${state.studentLoginError}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <h2 style="font-size:1.15rem; color:var(--blue-dark); margin-bottom:4px;">
+            第二步：點選你的偵探夥伴（點擊可聽男聲 / 女聲打招呼）：
+          </h2>
+          <div class="avatar-grid">${cardsHtml}</div>
+
+          <button class="btn btn-primary" onclick="startAdventure()">
+            🚀 登入並出發去任務大廳 Start!
+          </button>
+        </section>
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 畫面 2：任務大廳 (Mission Hub)
+    // --------------------------------------------------------------------------
+    function renderHubScreen() {
+      const detectiveObj = DETECTIVES.find(d => d.id === state.avatar) || DETECTIVES[0];
+      const allFourDone = state.completedMissions[1] && state.completedMissions[2] && state.completedMissions[3] && state.completedMissions[4];
+
+      const missionCards = [1, 2, 3, 4].map(mId => {
+        const m = MISSIONS[mId];
+        const done = state.completedMissions[mId];
+        const maxStars = mId === 1 || mId === 2 ? 6 : 7;
+        const earned = state.missionStars[mId];
+        return `
+          <div class="mission-card ${done ? "completed" : ""}">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+                <span class="mission-tag" style="background:${m.color}; color:var(--text-main);">
+                  ${done ? "✅ 已完成" : "🎯 進行中"}
+                </span>
+                <span style="font-weight:800; color:var(--yellow-dark); font-size:0.95rem;">
+                  ⭐ ${earned} / ${maxStars}
+                </span>
+              </div>
+              <h3 style="margin:4px 0; font-size:1.18rem; color:var(--blue-dark);">${m.titleEn}</h3>
+              <div style="font-weight:800; color:var(--pink-dark); margin-bottom:6px;">${m.titleZh}</div>
+              <p style="margin:0; font-size:0.95rem; color:var(--text-muted); line-height:1.5;">${m.descZh}</p>
+            </div>
+            <button class="btn ${done ? "btn-mint" : "btn-primary"}" style="width:100%;" onclick="startMission(${mId})">
+              ${done ? "🔄 再練習一次" : "▶️ 開始任務"}
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      const badgesHtml = BADGES.map(b => {
+        const earned = state.completedMissions[b.id];
+        return `
+          <div class="badge-slot ${earned ? "earned" : ""}">
+            <div style="font-size:2rem;">${earned ? b.icon : "🔒"}</div>
+            <div style="font-weight:800; font-size:0.95rem; color:var(--text-main); margin-top:4px;">${b.name}</div>
+            <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted);">${b.zh}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <section class="card hub-header">
+          <div class="hub-detective-info">
+            ${getDetectiveSVG(state.avatar, 84)}
+            <div>
+              <div style="font-size:0.9rem; font-weight:800; color:var(--blue-dark);">歡迎回來，${detectiveObj.zh}！</div>
+              <h2 style="margin:2px 0; font-size:1.4rem;">校園偵探任務大廳</h2>
+              <div style="font-size:0.95rem; color:var(--text-muted); font-weight:700;">
+                完成四大任務後，就能解鎖「我的英語自我介紹」最終舞台！
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-yellow" onclick="openFinalStage()">
+              🎤 最終自我介紹舞台
+            </button>
+          </div>
+        </section>
+
+        ${allFourDone ? `
+          <section class="card" style="background:linear-gradient(135deg, #fff5f8 0%, #fffbe6 100%); border-color:var(--pink-main); text-align:center;">
+            <h2 style="margin:0 0 6px; color:var(--pink-dark);">🎉 太厲害了！四大任務全部完成！</h2>
+            <p style="margin:0 0 14px; font-weight:700;">快進入最終口說舞台，完成「My Little Introduction 我的英語自我介紹」領取最高榮譽吧！</p>
+            <button class="btn btn-pink" onclick="openFinalStage()">🌟 進入最終任務 My Little Introduction</button>
+          </section>
+        ` : ""}
+
+        <div class="missions-grid">${missionCards}</div>
+
+        <section class="card" style="margin-top:18px;">
+          <h3 style="margin:0 0 4px; font-size:1.15rem; color:var(--blue-dark);">🏅 我的偵探徽章收集冊</h3>
+          <div style="font-size:0.9rem; color:var(--text-muted); font-weight:700;">每完成一個任務就能點亮一枚專屬徽章！</div>
+          <div class="badges-bar">${badgesHtml}</div>
+          <div style="margin-top:16px; text-align:right;">
+            <button class="nav-btn" onclick="fullResetGame()">🔄 全部重新開始</button>
+          </div>
+        </section>
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 畫面 3：關卡進行中 (Mission Steps)
+    // --------------------------------------------------------------------------
+    function renderMissionScreen() {
+      const m = MISSIONS[state.currentMission];
+      const step = m.steps[state.stepIndex];
+      const pct = Math.round(((state.stepIndex + 1) / m.steps.length) * 100);
+
+      let bodyHtml = "";
+      if (step.type === "explore_characters") {
+        bodyHtml = renderExploreCharacters(step);
+      } else if (step.type === "explore_ages") {
+        bodyHtml = renderExploreAges(step);
+      } else if (step.type === "mystery_box") {
+        bodyHtml = renderMysteryBox(step);
+      } else if (step.type === "match") {
+        bodyHtml = renderMatchActivity(step);
+      } else if (step.type === "order_dialogue") {
+        bodyHtml = renderOrderDialogue(step);
+      } else if (step.type === "speaking_practice") {
+        bodyHtml = renderSpeakingPracticeActivity(step);
+      } else if (step.type === "mcq") {
+        bodyHtml = renderMCQActivity(step);
+      }
+
+      return `
+        <section class="card">
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span>${m.titleEn}｜${m.titleZh}</span>
+              <span>進度：第 ${state.stepIndex + 1} / ${m.steps.length} 關</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%;"></div>
+            </div>
+          </div>
+
+          <div class="activity-badge">${step.badge}</div>
+          <div class="instruction-zh">${step.instructionZh}</div>
+
+          ${bodyHtml}
+        </section>
+      `;
+    }
+
+    function renderExploreCharacters(step) {
+      const visitedCount = step.characters.filter(c => state.visitedCards[c.name]).length;
+      const allVisited = visitedCount === step.characters.length;
+
+      const cards = step.characters.map(c => {
+        const visited = !!state.visitedCards[c.name];
+        const g = FRIEND_GENDER[c.name] || "female";
+        return `
+          <div class="explore-card ${visited ? "visited" : ""}" onclick="visitCharacterCard('${c.name}', '${c.line.replace(/'/g, "\\'")}', '${g}')">
+            ${getFriendSVG(c.name, 96)}
+            <div style="margin-top:6px;">
+              <span class="voice-tag ${g}">${g === "female" ? "👧 女生發音" : "👦 男生發音"}</span>
+            </div>
+            <div style="margin-top:6px; font-weight:800; font-size:1.15rem; color:var(--blue-dark);">Name: ${c.name}</div>
+            <div style="margin:6px 0; font-weight:700; color:var(--text-main); font-size:1rem;">"${c.line}"</div>
+            <span class="audio-btn" style="margin-top:4px;">🔊 聽發音</span>
+            <div style="margin-top:6px; font-size:0.85rem; font-weight:800; color:${visited ? 'var(--mint-dark)' : 'var(--text-muted)'};">
+              ${visited ? "✅ 已認識" : "👆 點擊認識"}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="explore-grid">${cards}</div>
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn btn-primary" ${allVisited ? "" : "disabled"} onclick="nextStep()">
+            ${allVisited ? "下一步：開始答題挑戰 ➡" : `請先點擊全部角色卡片 (${visitedCount}/${step.characters.length})`}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderExploreAges(step) {
+      const visitedCount = step.friends.filter(f => state.visitedCards["age_" + f.name]).length;
+      const allVisited = visitedCount === step.friends.length;
+
+      const cards = step.friends.map(f => {
+        const visited = !!state.visitedCards["age_" + f.name];
+        const g = FRIEND_GENDER[f.name] || "female";
+        return `
+          <div class="explore-card ${visited ? "visited" : ""}" onclick="visitAgeCard('${f.name}', '${f.line.replace(/'/g, "\\'")}', '${g}')">
+            ${getFriendSVG(f.name, 92)}
+            <div style="margin-top:4px;">
+              <span class="voice-tag ${g}">${g === "female" ? "👧 女生發音" : "👦 男生發音"}</span>
+            </div>
+            <div style="margin-top:6px; font-weight:800; font-size:1.15rem; color:var(--blue-dark);">${f.name}</div>
+            <div style="display:inline-block; background:var(--yellow-soft); border:2px solid var(--yellow-main); padding:2px 12px; border-radius:999px; font-weight:800; color:var(--yellow-dark); margin:4px 0;">
+              🎂 ${f.ageText}
+            </div>
+            <div style="margin:6px 0; font-weight:700; color:var(--text-main);">"${f.line}"</div>
+            <span class="audio-btn">🔊 聽發音</span>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="explore-grid">${cards}</div>
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn btn-primary" ${allVisited ? "" : "disabled"} onclick="nextStep()">
+            ${allVisited ? "下一步：年齡問答挑戰 ➡" : `請先點擊全部朋友卡片 (${visitedCount}/${step.friends.length})`}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderMysteryBox(step) {
+      const currentItem = STATIONERY_LIST[state.boxItemIndex];
+      const foundCount = STATIONERY_LIST.filter(s => state.visitedCards["box_" + s.key]).length;
+      const allFound = foundCount === STATIONERY_LIST.length;
+
+      return `
+        <div class="question-box">
+          <div class="mystery-stage">
+            <div style="font-weight:800; color:var(--blue-dark);">
+              已發現文具：${foundCount} / ${STATIONERY_LIST.length} 種
+            </div>
+
+            ${state.boxOpened ? `
+              <div class="item-reveal">
+                ${getStationerySVG(currentItem.key, 128)}
+                <div style="font-size:1.5rem; font-weight:900; color:var(--blue-dark); margin-top:6px;">
+                  ${currentItem.phrase}
+                </div>
+                <div style="font-size:1.1rem; font-weight:800; color:var(--mint-dark);">
+                  "${currentItem.sentence}"
+                </div>
+                <div style="font-size:0.95rem; color:var(--text-muted); font-weight:700; margin:4px 0 10px;">
+                  ${currentItem.zh}
+                </div>
+                <button class="audio-btn" onclick="speakEnglish('${currentItem.sentence.replace(/'/g, "\\'")}', 'auto')">🔊 再聽一次發音</button>
+              </div>
+            ` : `
+              <div class="box-container" onclick="openNextBoxItem()">
+                ${getMysteryBoxSVG(false)}
+                <div style="font-weight:800; color:var(--pink-dark); margin-top:6px;">👆 點擊神祕箱打開看看！</div>
+              </div>
+            `}
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px;">
+              <button class="btn btn-yellow" onclick="openNextBoxItem()">
+                🎁 ${state.boxOpened ? "打開下一個神祕箱" : "打開神祕箱"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <button class="btn btn-primary" ${allFound ? "" : "disabled"} onclick="nextStep()">
+            ${allFound ? "全部文具都找到了！開始闖關 ➡" : `請打開箱子找出全部 6 種文具 (${foundCount}/6)`}
+          </button>
+        </div>
+      `;
+    }
+
+    function renderMatchActivity(step) {
+      const mState = state.matchState;
+      const allMatched = mState.matchedIds.length === step.pairs.length;
+      const stepKey = `${state.currentMission}_${state.stepIndex}_${step.id}`;
+      if (!state.shuffledRightPairs || state.shuffledRightPairsKey !== stepKey) {
+        state.shuffledRightPairs = shuffleArray(step.pairs);
+        state.shuffledRightPairsKey = stepKey;
+      }
+      const rightOrder = state.shuffledRightPairs;
+
+      const leftHtml = step.pairs.map(p => {
+        const isMatched = mState.matchedIds.includes(p.id);
+        const isSelected = mState.selectedLeft === p.id;
+        return `
+          <button class="match-tile ${isMatched ? "matched" : ""} ${isSelected ? "selected" : ""}"
+            ${isMatched ? "disabled" : ""}
+            onclick="selectMatchLeft('${p.id}', '${p.left.replace(/'/g, "\\'")}', 'auto')">
+            ${isMatched ? "✅ " : ""}${p.left}
+          </button>
+        `;
+      }).join("");
+
+      const rightHtml = rightOrder.map(p => {
+        const isMatched = mState.matchedIds.includes(p.id);
+        return `
+          <button class="match-tile ${isMatched ? "matched" : ""}"
+            ${isMatched ? "disabled" : ""}
+            onclick="selectMatchRight('${p.id}', '${p.right.replace(/'/g, "\\'")}', '${p.gender || "auto"}')">
+            ${isMatched ? "✅ " : ""}${p.right}
+          </button>
+        `;
+      }).join("");
+
+      return `
+        <div class="question-box">
+          <div class="match-columns">
+            <div class="match-col">
+              <div style="font-weight:800; color:var(--blue-dark);">1. 點選左邊問題或提示</div>
+              ${leftHtml}
+            </div>
+            <div class="match-col">
+              <div style="font-weight:800; color:var(--mint-dark);">2. 點選右邊正確回答</div>
+              ${rightHtml}
+            </div>
+          </div>
+          ${mState.errorPair ? `
+            <div class="feedback-box retry" style="width:100%;">
+              💡 Good try! 這兩句意思配不起來喔，請再試試看！
+            </div>
+          ` : ""}
+          ${allMatched ? `
+            <div class="feedback-box success" style="width:100%;">
+              🌟 <strong>Excellent! 全部配對成功！</strong> 獲得 1 顆星星 ⭐（記住：My name is... 和 I'm... 都是正確的自我介紹喔！）
+            </div>
+          ` : ""}
+        </div>
+
+        ${allMatched ? `
+          <div style="text-align:center;">
+            <button class="btn btn-primary" onclick="nextStep()">繼續下一關：口說練習 ➡</button>
+          </div>
+        ` : ""}
+      `;
+    }
+
+    function renderOrderDialogue(step) {
+      const slots = state.orderSlots;
+      const allFilled = slots.every(s => s !== null);
+      const isSolved = state.questionAnswered;
+      const stepKey = `${state.currentMission}_${state.stepIndex}_${step.id}`;
+      if (!state.shuffledDialogueLines || state.shuffledDialogueKey !== stepKey) {
+        state.shuffledDialogueLines = shuffleArray(step.shuffledLines);
+        state.shuffledDialogueKey = stepKey;
+      }
+
+      const slotsHtml = [0, 1, 2, 3].map(idx => {
+        const val = slots[idx];
+        return `
+          <div class="order-slot ${val ? "filled" : ""}" onclick="removeOrderSlot(${idx})">
+            <span class="slot-num">${idx + 1}</span>
+            <span>${val ? val : "點擊下方句子放入第 " + (idx + 1) + " 句"}</span>
+          </div>
+        `;
+      }).join("");
+
+      const bankHtml = state.shuffledDialogueLines.map(line => {
+        const used = slots.includes(line);
+        return `
+          <button class="bank-chip" ${used || isSolved ? "disabled" : ""} onclick="pickOrderLine('${line.replace(/'/g, "\\'")}')">
+            ${line}
+          </button>
+        `;
+      }).join("");
+
+      return `
+        <div class="question-box">
+          <div class="order-slots">${slotsHtml}</div>
+          <div class="word-bank">${bankHtml}</div>
+
+          ${!isSolved ? `
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px;">
+              <button class="btn btn-outline" onclick="clearOrderSlots()">🔄 全部清空重排</button>
+              <button class="btn btn-primary" ${allFilled ? "" : "disabled"} onclick="checkOrderDialogue()">
+                ✅ 檢查對話順序
+              </button>
+            </div>
+          ` : ""}
+
+          ${state.orderChecked && !isSolved ? `
+            <div class="feedback-box retry" style="width:100%;">
+              💡 <strong>Good try!</strong> 提示：先問名字（What's your name?）→ 回答名字 → 再問幾歲（How old are you?）→ 回答年齡！
+            </div>
+          ` : ""}
+
+          ${isSolved ? `
+            <div class="feedback-box success" style="width:100%; text-align:left;">
+              🌟 <strong>You're a star! 對話順序完全正確！</strong> 獲得 1 顆星星 ⭐<br/>
+              <div style="margin-top:8px; background:#ffffff; padding:10px 14px; border-radius:12px;">
+                <div>1. What's your name?</div>
+                <div>2. My name is Tom.</div>
+                <div>3. How old are you?</div>
+                <div>4. I'm nine years old.</div>
+                <div style="margin-top:6px; color:var(--blue-dark); font-size:0.95rem;">${step.zhMeaning}</div>
+              </div>
+              <div style="margin-top:10px; text-align:center;">
+                <button class="audio-btn" onclick="speakEnglish('What is your name? My name is Tom. How old are you? I am nine years old.', 'male')">
+                  🔊 聽完整對話朗讀
+                </button>
+              </div>
+            </div>
+          ` : ""}
+        </div>
+
+        ${isSolved ? `
+          <div style="text-align:center;">
+            <button class="btn btn-primary" onclick="nextStep()">繼續下一題 ➡</button>
+          </div>
+        ` : ""}
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 評分結果卡片產生器 (共用元件：供關卡口說練習與最終自我介紹舞台顯示)
+    // --------------------------------------------------------------------------
+    function renderEvaluationResultCard(evalRes, retryOnClickStr) {
+      if (!evalRes || !evalRes.hasValidSpeech) return "";
+
+      const starIcons = evalRes.speakingStars > 0
+        ? "⭐".repeat(evalRes.speakingStars) + `（獲得 ${evalRes.speakingStars} 顆口說練習星星）`
+        : "尚未獲得口說練習星星（70 分以上可獲得 1～3 顆口說星星）";
+
+      return `
+        <div class="transcript-result-card">
+          <div style="font-size:0.9rem; font-weight:800; color:var(--text-muted); margin-bottom:4px;">
+            🗣️ 語音辨識結果（你說出的英文）：
+          </div>
+          <div style="background:#f3f8ff; border:2px solid #cbe0fa; border-radius:12px; padding:10px 14px; font-size:1.15rem; font-weight:800; color:var(--blue-dark); margin-bottom:12px;">
+            "${evalRes.spokenRaw}"
+          </div>
+
+          <div class="score-header-row">
+            <div>
+              <div style="font-weight:900; font-size:1.05rem; color:var(--text-main);">
+                📊 口說練習估算分數
+              </div>
+              ${evalRes.isPartialAssessment ? `
+                <div style="font-size:0.84rem; font-weight:800; color:#8a4b00; margin-top:2px;">
+                  ⚠️ 部分項目無法評估（已依可評估的 85 分項目換算百分比）
+                </div>
+              ` : ""}
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span class="score-big-badge">${evalRes.finalPercentScore} 分</span>
+              <span class="score-grade-pill" style="background:${evalRes.gradeBg}; color:${evalRes.gradeColor};">
+                ${evalRes.gradeLabel}
+              </span>
+            </div>
+          </div>
+
+          <div style="font-weight:800; font-size:0.95rem; color:var(--pink-dark); margin-bottom:8px;">
+            ${starIcons}
+          </div>
+
+          <div class="score-breakdown-grid">
+            <div class="breakdown-item">
+              <div class="breakdown-label">1. 句子符合度（滿分 60）</div>
+              <div class="breakdown-val">${evalRes.accuracyScore} / 60 分</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">2. 句子完整度（滿分 25）</div>
+              <div class="breakdown-val">${evalRes.completenessScore} / 25 分</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">3. 流暢度估算（滿分 15）</div>
+              <div class="breakdown-val" style="${!evalRes.fluencyAvailable ? 'color:var(--text-muted); font-size:0.92rem;' : ''}">
+                ${evalRes.fluencyText}
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px; font-size:0.96rem; font-weight:700; color:var(--text-main); line-height:1.55;">
+            ${evalRes.feedbackTips.map(tip => `<div style="margin-top:4px;">${tip}</div>`).join("")}
+          </div>
+
+          <div class="disclaimer-note">
+            此分數是根據瀏覽器語音辨識文字及有限的錄音資訊估算，並非專業發音評測，也不代表真正的 AI 發音評分。
+          </div>
+
+          <div style="text-align:center; margin-top:12px;">
+            <button class="btn btn-outline" onclick="${retryOnClickStr}">
+              🔄 清除結果並再次練習
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 活動類型 G：關卡內「跟著唸一唸」互動口說練習室 (升級版 Web Speech API + 估算評分)
+    // --------------------------------------------------------------------------
+    function renderSpeakingPracticeActivity(step) {
+      const idx = state.speakingLineIdx;
+      const line = step.lines[idx];
+      const lineKey = `${step.id}_${idx}`;
+      const evalRes = state.speakingResultByLine[lineKey];
+      const isSelfDone = !!state.speakingSelfPracticed[lineKey];
+
+      const tabsHtml = step.lines.map((item, i) => {
+        const k = `${step.id}_${i}`;
+        const r = state.speakingResultByLine[k];
+        const sp = state.speakingSelfPracticed[k];
+        const badgeIcon = r ? (r.speakingStars > 0 ? "⭐" : "✅") : (sp ? "✅" : "🎤");
+        return `
+          <button class="chip-btn ${i === idx ? "active" : ""}" onclick="selectSpeakingLine(${i})">
+            ${badgeIcon} 第 ${i + 1} 句
+          </button>
+        `;
+      }).join("");
+
+      return `
+        <div class="speaking-studio">
+          <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            ${tabsHtml}
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin:8px 0;">
+            ${getFriendSVG(line.speaker, 76)}
+            <div style="text-align:left;">
+              <div style="font-weight:800; font-size:1.1rem; color:var(--text-main);">${line.speaker} 示範</div>
+              <span class="voice-tag ${line.gender}">
+                ${line.gender === "female" ? "👧 AI 女聲示範" : "👦 AI 男聲示範"}
+              </span>
+            </div>
+          </div>
+
+          <div class="speaking-target-card">
+            <div class="speaking-en-text">${line.en}</div>
+            <div class="speaking-zh-text">${line.zh}</div>
+          </div>
+
+          ${isSpeechRecognitionSupported ? `
+            <!-- 支援 Web Speech API 的麥克風辨識與估算評分介面 -->
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+              <button class="audio-btn" onclick="speakEnglish('${line.en.replace(/'/g, "\\'")}', '${line.gender}')">
+                🔊 1. 聽示範發音
+              </button>
+
+              ${!state.speakingRecording ? `
+                <button class="btn btn-pink" onclick="startSpeakingRecord('${step.id}', ${idx})">
+                  🎙️ 2. 開始錄音
+                </button>
+              ` : `
+                <button class="btn btn-red" onclick="stopCurrentRecordingByUser()">
+                  ⏹️ 停止錄音
+                </button>
+              `}
+            </div>
+
+            ${state.speakingRecording ? `
+              <div class="live-transcript-box">
+                <div class="wave-bars">
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                  <div class="wave-bar"></div>
+                </div>
+                <div style="font-weight:800; color:var(--pink-dark); font-size:1.05rem;">
+                  🎙️ 錄音中... 請對著麥克風大聲朗讀：<em>"${line.en}"</em>
+                </div>
+                <div style="margin-top:8px; background:#f8fbff; border-radius:10px; padding:8px 12px; font-weight:800; color:var(--blue-dark); min-height:40px;">
+                  ${state.speakingInterimText
+                    ? `👂 即時辨識中：${state.speakingInterimText}`
+                    : "⏳ 等待語音輸入中..."}
+                </div>
+              </div>
+            ` : ""}
+
+            ${state.speakingErrorMsg && !state.speakingRecording ? `
+              <div class="feedback-box error-alert">
+                <div>${state.speakingErrorMsg}</div>
+                <div style="margin-top:10px;">
+                  <button class="btn btn-pink" onclick="startSpeakingRecord('${step.id}', ${idx})">
+                    🎙️ 重新嘗試錄音
+                  </button>
+                </div>
+              </div>
+            ` : ""}
+
+            ${evalRes && !state.speakingRecording ? renderEvaluationResultCard(evalRes, `startSpeakingRecord('${step.id}', ${idx})`) : ""}
+          ` : `
+            <!-- 不支援 SpeechRecognition 時的自行練習模式（絕不顯示辨識結果或假裝評分） -->
+            <div class="feedback-box retry" style="text-align:left; margin-top:12px;">
+              ℹ️ 目前使用的瀏覽器不支援語音辨識，請改用支援的瀏覽器，或使用下方的自行練習模式。
+            </div>
+
+            <div style="background:#ffffff; border:2px solid var(--border-soft); border-radius:16px; padding:14px; margin-top:12px;">
+              <div style="font-weight:800; color:var(--blue-dark); margin-bottom:8px;">
+                🎧 自行練習模式：請先聽示範發音，再大聲跟著朗讀一遍！
+              </div>
+              <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="audio-btn" onclick="speakEnglish('${line.en.replace(/'/g, "\\'")}', '${line.gender}')">
+                  🔊 播放標準句子
+                </button>
+                <button class="btn btn-mint" onclick="markSelfPracticeDone('${step.id}', ${idx})">
+                  ${isSelfDone ? "✅ 已完成自行朗讀（再練一次）" : "✅ 我已經大聲跟著唸過了"}
+                </button>
+              </div>
+            </div>
+          `}
+
+          ${idx < step.lines.length - 1 ? `
+            <div style="margin-top:14px;">
+              <button class="nav-btn" onclick="selectSpeakingLine(${idx + 1})">
+                切換到下一句練習 (${idx + 2}/${step.lines.length}) ➡
+              </button>
+            </div>
+          ` : ""}
+        </div>
+
+        <!-- 口說練習為額外挑戰，無論是否使用麥克風皆可順利完成本任務 -->
+        <div style="text-align:center; margin-top:18px;">
+          <div style="font-size:0.92rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;">
+            💡 口說練習是額外挑戰，你可以隨時反覆練習，也可以直接點下方按鈕完成本任務領取徽章！
+          </div>
+          <button class="btn btn-mint" onclick="completeSpeakingStepAndFinishMission('${step.id}')">
+            完成本任務！領取徽章 🏆
+          </button>
+        </div>
+      `;
+    }
+
+    // 活動類型 F：標準視覺化選擇題 (MCQ)
+    function renderMCQActivity(step) {
+      let visualHtml = "";
+      let promptGender = step.voiceGender || "auto";
+
+      if (step.visualType === "friend") {
+        visualHtml = getFriendSVG(step.visualValue, 110);
+        promptGender = FRIEND_GENDER[step.visualValue] || "auto";
+      } else if (step.visualType === "stationery") {
+        visualHtml = getStationerySVG(step.visualValue, 130);
+      } else if (step.visualType === "profile") {
+        const friendName = step.profile.friend;
+        const g = FRIEND_GENDER[friendName] || "auto";
+        visualHtml = `
+          <div class="profile-card">
+            ${getFriendSVG(friendName, 92)}
+            <div class="profile-details">
+              ${step.profile.rows.map(r => `
+                <div class="profile-row">
+                  <span class="profile-label">${r.label}</span>
+                  <span>${r.value}</span>
+                </div>
+              `).join("")}
+              <div style="margin-top:4px;">
+                <span class="voice-tag ${g}">${g === "female" ? "👧 Amy (女聲)" : `👦 ${friendName} (男聲)`}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (step.visualType === "full_profile") {
+        const friendName = step.profile.friend;
+        const g = FRIEND_GENDER[friendName] || "auto";
+        visualHtml = `
+          <div class="profile-card">
+            ${getFriendSVG(friendName, 92)}
+            <div class="profile-details">
+              ${step.profile.rows.map(r => `
+                <div class="profile-row">
+                  <span class="profile-label">${r.label}</span>
+                  <span>${r.value}</span>
+                </div>
+              `).join("")}
+              <div style="margin-top:4px;">
+                <span class="voice-tag ${g}">${g === "female" ? "👧 Amy (女聲)" : `👦 ${friendName} (男聲)`}</span>
+              </div>
+            </div>
+            ${getStationerySVG(step.profile.item, 78)}
+          </div>
+        `;
+      } else if (step.visualType === "near_far") {
+        visualHtml = getNearFarSceneSVG(step.nearItem, step.farItem, step.target);
+      } else if (step.visualType === "dialogue_bubble") {
+        visualHtml = `
+          <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
+            ${getDetectiveSVG(state.avatar, 86)}
+            <div style="background:#fff; border:3px solid var(--blue-main); border-radius:18px; padding:12px 18px; font-size:1.25rem; font-weight:800; color:var(--blue-dark);">
+              ${step.speakerA} 🔭
+            </div>
+            ${getStationerySVG(step.item, 94)}
+          </div>
+        `;
+      } else if (step.visualType === "mini_chat") {
+        const blank1Text = step.chatStep === 1
+          ? (state.questionAnswered ? "✅ My name is Ben." : "❓ [ 空格 1 ]")
+          : "✅ My name is Ben.";
+        const blank2Text = step.chatStep === 2
+          ? (state.questionAnswered ? "✅ It's an eraser." : "❓ [ 空格 2 ]")
+          : "......";
+
+        visualHtml = `
+          <div class="chat-list">
+            <div class="chat-row">
+              ${getDetectiveSVG(state.avatar, 54)}
+              <div class="chat-bubble">
+                A: Hello! What's your name?
+                <button class="audio-btn" style="min-height:34px; padding:2px 10px; font-size:0.85rem; margin-left:6px;" onclick="speakEnglish('Hello! What is your name?', 'auto')">🔊</button>
+              </div>
+            </div>
+            <div class="chat-row right">
+              ${getFriendSVG("Ben", 54)}
+              <div class="chat-bubble" style="${step.chatStep === 1 ? 'border-color:var(--pink-main); background:var(--pink-soft);' : ''}">
+                B: ${blank1Text}
+              </div>
+            </div>
+            <div class="chat-row">
+              ${getDetectiveSVG(state.avatar, 54)}
+              <div class="chat-bubble">
+                A: How old are you?
+                <button class="audio-btn" style="min-height:34px; padding:2px 10px; font-size:0.85rem; margin-left:6px;" onclick="speakEnglish('How old are you?', 'auto')">🔊</button>
+              </div>
+            </div>
+            <div class="chat-row right">
+              ${getFriendSVG("Ben", 54)}
+              <div class="chat-bubble">
+                B: I'm ten years old.
+                <button class="audio-btn" style="min-height:34px; padding:2px 10px; font-size:0.85rem; margin-left:6px;" onclick="speakEnglish('I am ten years old.', 'male')">🔊</button>
+              </div>
+            </div>
+            <div class="chat-row">
+              ${getDetectiveSVG(state.avatar, 54)}
+              <div class="chat-bubble" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span>A: What's this?</span>
+                ${getStationerySVG("eraser", 54)}
+                <button class="audio-btn" style="min-height:34px; padding:2px 10px; font-size:0.85rem;" onclick="speakEnglish('What is this?', 'auto')">🔊</button>
+              </div>
+            </div>
+            ${step.chatStep === 2 ? `
+              <div class="chat-row right">
+                ${getFriendSVG("Ben", 54)}
+                <div class="chat-bubble" style="border-color:var(--pink-main); background:var(--pink-soft);">
+                  B: ${blank2Text}
+                </div>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+
+      const cleanSpeech = step.promptEn.replace(/\(.*?\)/g, "").replace(/______/g, "blank").trim();
+
+      const stepKey = `${state.currentMission}_${state.stepIndex}_${step.id}`;
+      if (!state.shuffledOptions || state.shuffledOptionStepKey !== stepKey) {
+        state.shuffledOptions = shuffleArray(
+          step.options.map((text, origIdx) => ({ text, origIdx }))
+        );
+        state.shuffledOptionStepKey = stepKey;
+      }
+
+      const optionsHtml = state.shuffledOptions.map((optObj, displayIdx) => {
+        let cls = "";
+        if (state.questionAnswered && optObj.origIdx === step.correctIndex) {
+          cls = "correct";
+        } else if (state.selectedOptionIdx === displayIdx && optObj.origIdx !== step.correctIndex) {
+          cls = "wrong";
+        }
+        return `
+          <button class="option-btn ${cls}" ${state.questionAnswered ? "disabled" : ""} onclick="answerMCQ(${displayIdx})">
+            <span>${optObj.text}</span>
+          </button>
+        `;
+      }).join("");
+
+      const isLastStep = state.stepIndex === MISSIONS[state.currentMission].steps.length - 1;
+      const ansGender = step.visualType === "mini_chat" ? "male" : promptGender;
+
+      return `
+        <div class="question-box">
+          ${visualHtml}
+          <h3 class="english-prompt">${step.promptEn}</h3>
+          ${step.visualType !== "mini_chat" ? `
+            <button class="audio-btn" onclick="speakEnglish('${cleanSpeech.replace(/'/g, "\\'")}', '${promptGender}')">🔊 聽題目發音</button>
+          ` : ""}
+        </div>
+
+        <div class="options-grid ${step.options.length === 3 ? 'three-col' : 'two-col'}">
+          ${optionsHtml}
+        </div>
+
+        ${state.questionAnswered ? `
+          <div class="feedback-box success">
+            🌟 <strong>Great job! 答對了！</strong> 獲得 1 顆星星 ⭐<br/>
+            <button class="audio-btn" style="margin-top:8px;" onclick="speakEnglish('${step.options[step.correctIndex].replace(/'/g, "\\'")}', '${ansGender}')">
+              🔊 再聽一次正確句子：${step.options[step.correctIndex]}
+            </button>
+          </div>
+          <div style="text-align:center; margin-top:16px;">
+            <button class="btn btn-mint" onclick="nextStep()">
+              ${isLastStep ? "完成本任務！領取徽章 🏆" : "繼續下一題 ➡"}
+            </button>
+          </div>
+        ` : state.lastAnswerCorrect === false ? `
+          <div class="feedback-box retry">
+            💡 <strong>Good try! Let's try again!</strong><br/>
+            ${step.hintZh}
+          </div>
+        ` : ""}
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 畫面 4：單一任務完成與徽章頒發畫面
+    // --------------------------------------------------------------------------
+    function renderMissionCompleteScreen() {
+      const m = MISSIONS[state.currentMission];
+      const badge = BADGES.find(b => b.id === state.currentMission);
+      const nextMissionId = state.currentMission + 1;
+      const hasNextMission = nextMissionId <= 4;
+
+      return `
+        <section class="card hero-banner" style="animation: popIn 0.3s ease;">
+          <div style="font-size:3.5rem;">🎉🏆🎉</div>
+          <h2 class="game-title" style="font-size:1.9rem;">Mission Clear! 任務完成！</h2>
+          <div class="game-subtitle">${m.titleEn}｜${m.titleZh}</div>
+
+          <div style="background:#fff; border:3px solid var(--yellow-main); border-radius:24px; padding:20px; max-width:440px; margin:16px auto;">
+            <div style="font-size:3rem;">${badge.icon}</div>
+            <div style="font-size:0.95rem; font-weight:800; color:var(--yellow-dark);">獲得專屬偵探徽章</div>
+            <div style="font-size:1.4rem; font-weight:800; color:var(--blue-dark); margin:4px 0;">${badge.name}</div>
+            <div style="font-size:1.05rem; font-weight:700; color:var(--text-muted);">${badge.zh}</div>
+            <div style="margin-top:10px; font-weight:800; color:var(--pink-dark);">
+              遊戲任務星星：⭐ ${state.stars} / 26 ｜ 🎙️ 口說練習星：${state.speakingStarsTotal} 顆
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:18px;">
+            <button class="btn btn-outline" onclick="goToHub()">🏫 回到任務大廳</button>
+            ${hasNextMission ? `
+              <button class="btn btn-primary" onclick="startMission(${nextMissionId})">
+                🚀 挑戰下一個任務 (Mission ${nextMissionId}) ➡
+              </button>
+            ` : `
+              <button class="btn btn-pink" onclick="openFinalStage()">
+                🎤 進入最終任務：我的英語自我介紹 ➡
+              </button>
+            `}
+          </div>
+        </section>
+      `;
+    }
+
+    // --------------------------------------------------------------------------
+    // 畫面 5：最終任務｜My Little Introduction 我的英語自我介紹 (整合語音辨識與估算評分)
+    // --------------------------------------------------------------------------
+    function getFinalIntroLines() {
+      const selectedItemObj = STATIONERY_LIST.find(s => s.key === state.introItem) || STATIONERY_LIST[0];
+      const safeName = state.introName.trim() || "Amy";
+      return [
+        { en: "Hello!", zh: "你好！" },
+        { en: `My name is ${safeName}.`, zh: `我的名字是 ${safeName}。` },
+        { en: `I'm ${state.introAge} years old.`, zh: `我今年 ${state.introAge === "eight" ? "8" : state.introAge === "nine" ? "9" : "10"} 歲。` },
+        { en: "What's this?", zh: "這是什麼？" },
+        { en: `It's ${selectedItemObj.phrase}.`, zh: `這是${selectedItemObj.zh.split("（")[0]}。` }
+      ];
+    }
+
+    function renderFinalIntroScreen() {
+      const safeName = state.introName.trim() || "Amy";
+      const detectiveObj = DETECTIVES.find(d => d.id === state.avatar) || DETECTIVES[0];
+      const stageGender = FRIEND_GENDER[safeName] || detectiveObj.gender;
+
+      const lines = getFinalIntroLines();
+      const fullParagraph = lines.map(l => l.en).join(" ");
+      const showAll = state.introStep >= lines.length;
+      const currentLine = lines[Math.min(state.introStep, lines.length - 1)];
+      const activeTargetEn = showAll ? fullParagraph : currentLine.en;
+
+      const presetNames = ["Amy", "Tom", "Ben", "Mia", "Leo"];
+
+      return `
+        <section class="card stage-box">
+          <span class="mission-tag" style="background:var(--pink-main); color:#fff;">
+            👑 Final Mission｜口說練習舞台
+          </span>
+          <h2 class="game-title" style="font-size:1.75rem; margin-top:6px;">My Little Introduction</h2>
+          <div class="game-subtitle">我的英語自我介紹</div>
+
+          <!-- 角色與文具展示區 -->
+          <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin:12px 0; flex-wrap:wrap;">
+            ${getDetectiveSVG(state.avatar, 114)}
+            <div style="font-size:1.8rem;">➕</div>
+            ${getStationerySVG(state.introItem, 114)}
+          </div>
+
+          <!-- 自訂姓名、年齡、文具選擇器 -->
+          <div style="background:rgba(255,255,255,0.9); border-radius:18px; padding:14px; margin:12px auto; max-width:680px; border:2px solid var(--border-soft);">
+            <div style="font-weight:800; color:var(--blue-dark); margin-bottom:4px;">1. 選擇或輸入你的英文名字：</div>
+            <div class="chip-group">
+              ${presetNames.map(n => `
+                <button class="chip-btn ${state.introName === n ? 'active' : ''}" onclick="setIntroName('${n}')">${n}</button>
+              `).join("")}
+              <input class="name-input" type="text" maxlength="16" value="${safeName}" placeholder="輸入英文名字" oninput="setIntroName(this.value)" />
+            </div>
+
+            <div style="font-weight:800; color:var(--blue-dark); margin-bottom:4px;">2. 選擇你的年齡：</div>
+            <div class="chip-group">
+              <button class="chip-btn ${state.introAge === 'eight' ? 'active' : ''}" onclick="setIntroAge('eight')">eight (8歲)</button>
+              <button class="chip-btn ${state.introAge === 'nine' ? 'active' : ''}" onclick="setIntroAge('nine')">nine (9歲)</button>
+              <button class="chip-btn ${state.introAge === 'ten' ? 'active' : ''}" onclick="setIntroAge('ten')">ten (10歲)</button>
+            </div>
+
+            <div style="font-weight:800; color:var(--blue-dark); margin-bottom:4px;">3. 選擇你手上拿的文具：</div>
+            <div class="chip-group">
+              ${STATIONERY_LIST.map(s => `
+                <button class="chip-btn ${state.introItem === s.key ? 'active' : ''}" onclick="setIntroItem('${s.key}')">${s.phrase}</button>
+              `).join("")}
+            </div>
+          </div>
+
+          <!-- 逐句 / 全部句子展示卡 -->
+          <div class="speech-card">
+            ${!showAll ? `
+              <div style="font-size:0.92rem; font-weight:800; color:var(--purple-main);">
+                第 ${state.introStep + 1} / ${lines.length} 句（逐句口說練習）
+              </div>
+              <div class="speech-line">${currentLine.en}</div>
+              <div style="font-size:1rem; font-weight:700; color:var(--text-muted); margin-bottom:14px;">
+                ${currentLine.zh}
+              </div>
+            ` : `
+              <div style="font-size:0.95rem; font-weight:800; color:var(--mint-dark); margin-bottom:8px;">
+                ✨ 完整自我介紹講稿（請大聲完整唸一遍！）
+              </div>
+              ${lines.map(l => `
+                <div class="speech-line" style="font-size:1.3rem; margin:6px 0;">${l.en}</div>
+              `).join("")}
+            `}
+
+            ${isSpeechRecognitionSupported ? `
+              <!-- 支援 Web Speech API：提供聽示範、開始/停止錄音與估算評分 -->
+              <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+                <button class="audio-btn" onclick="speakEnglish('${activeTargetEn.replace(/'/g, "\\'")}', '${stageGender}')">
+                  🔊 聽示範發音
+                </button>
+
+                ${!state.introRecording ? `
+                  <button class="btn btn-pink" onclick="startIntroMicPractice()">
+                    🎙️ 開始錄音
+                  </button>
+                ` : `
+                  <button class="btn btn-red" onclick="stopCurrentRecordingByUser()">
+                    ⏹️ 停止錄音
+                  </button>
+                `}
+              </div>
+
+              ${state.introRecording ? `
+                <div class="live-transcript-box">
+                  <div class="wave-bars">
+                    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+                  </div>
+                  <div style="font-weight:800; color:var(--pink-dark);">
+                    🎙️ 錄音中... 請大聲唸出：「${activeTargetEn}」
+                  </div>
+                  <div style="margin-top:8px; background:#f8fbff; border-radius:10px; padding:8px 12px; font-weight:800; color:var(--blue-dark); min-height:40px;">
+                    ${state.introInterimText
+                      ? `👂 即時辨識中：${state.introInterimText}`
+                      : "⏳ 等待語音輸入中..."}
+                  </div>
+                </div>
+              ` : ""}
+
+              ${state.introErrorMsg && !state.introRecording ? `
+                <div class="feedback-box error-alert">
+                  <div>${state.introErrorMsg}</div>
+                  <div style="margin-top:10px;">
+                    <button class="btn btn-pink" onclick="startIntroMicPractice()">
+                      🎙️ 重新嘗試錄音
+                    </button>
+                  </div>
+                </div>
+              ` : ""}
+
+              ${state.introEvalResult && !state.introRecording ? renderEvaluationResultCard(state.introEvalResult, "startIntroMicPractice()") : ""}
+            ` : `
+              <!-- 不支援 SpeechRecognition：提供自行練習模式 -->
+              <div class="feedback-box retry" style="text-align:left; margin-top:12px;">
+                ℹ️ 目前使用的瀏覽器不支援語音辨識，請改用支援的瀏覽器，或使用下方的自行練習模式。
+              </div>
+              <div style="margin-top:12px;">
+                <button class="audio-btn" onclick="speakEnglish('${activeTargetEn.replace(/'/g, "\\'")}', '${stageGender}')">
+                  🔊 播放標準句子（自行跟著朗讀）
+                </button>
+              </div>
+            `}
+
+            <!-- 切換句子或完成挑戰（不因辨識結果而阻擋過關） -->
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px; padding-top:12px; border-top:2px dashed var(--border-soft);">
+              ${!showAll ? `
+                <button class="btn btn-mint" onclick="nextIntroLine()">
+                  下一句練習 (${state.introStep + 2 <= lines.length ? `${state.introStep + 2}/${lines.length}` : "完整講稿"}) ➡
+                </button>
+              ` : `
+                <button class="btn btn-outline" onclick="restartIntroPractice()">🔄 重新逐句練習</button>
+                <button class="btn btn-pink" onclick="finishAllChallenge()">🌟 完成自我介紹挑戰</button>
+              `}
+            </div>
+          </div>
+
+          <!-- 最終榮譽證書 -->
+          ${state.introFinished ? `
+            <div style="background:#ffffff; border:4px solid var(--mint-main); border-radius:24px; padding:22px; max-width:620px; margin:20px auto 0; animation: popIn 0.3s ease;">
+              <div style="font-size:3rem;">🌟🎓🏆</div>
+              <h2 style="margin:6px 0; font-size:1.85rem; color:var(--pink-dark);">You're an English Star!</h2>
+              <p style="font-weight:800; font-size:1.1rem; color:var(--blue-dark); margin:6px 0;">
+                太棒了，${safeName} 小偵探！你成功找回所有文具並完成了英語自我介紹！
+              </p>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--yellow-dark); margin:10px 0;">
+                遊戲任務星星：⭐ ${state.stars} / 26 顆 ｜ 🎙️ 額外口說練習星：${state.speakingStarsTotal} 顆
+              </div>
+              <div class="badges-bar" style="margin:14px 0;">
+                ${BADGES.map(b => `
+                  <div class="badge-slot earned">
+                    <div style="font-size:1.7rem;">${b.icon}</div>
+                    <div style="font-weight:800; font-size:0.85rem;">${b.name}</div>
+                  </div>
+                `).join("")}
+              </div>
+              <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
+                <button class="btn btn-outline" onclick="goToHub()">🏫 回到任務大廳</button>
+                <button class="btn btn-primary" onclick="fullResetGame()">🔄 重新挑戰 Play Again</button>
+              </div>
+            </div>
+          ` : ""}
+        </section>
+      `;
+    }
+
+    /* ==========================================================================
+       7. 互動事件處理函式 (Event Handlers)
+       ========================================================================== */
+    function handleStudentCodeInput(inputEl) {
+      const cleaned = (inputEl.value || "").replace(/\D/g, "").slice(0, 5);
+      if (inputEl.value !== cleaned) {
+        inputEl.value = cleaned;
+      }
+      state.studentCodeInput = cleaned;
+      state.studentLoginError = "";
+
+      const previewEl = document.getElementById("studentCodePreviewEl");
+      if (previewEl) {
+        if (/^\d{5}$/.test(cleaned)) {
+          const matchedRoster = state.rosterList.find(r => r.code === cleaned);
+          previewEl.innerHTML = `
+            <div style="margin-top:8px; font-weight:800; color:var(--mint-dark); font-size:0.98rem;">
+              ✅ ${formatFiveDigitClassSeat(cleaned)} ${matchedRoster && matchedRoster.name ? `（${matchedRoster.name}）` : ""}
+            </div>
+          `;
+        } else {
+          previewEl.innerHTML = "";
+        }
+      }
+
+      const errorEl = document.getElementById("studentLoginErrorEl");
+      if (errorEl) {
+        errorEl.innerHTML = "";
+      }
+    }
+
+    function selectAvatar(id) {
+      playTone("click");
+      state.avatar = id;
+      const d = DETECTIVES.find(item => item.id === id);
+      if (d) speakEnglish(`Hello! I am ${d.en}.`, d.gender);
+      render();
+    }
+
+    async function startAdventure() {
+      const code = (state.studentCodeInput || "").trim();
+      if (!/^\d{5}$/.test(code)) {
+        playTone("wrong");
+        state.studentLoginError = "⚠️ 請先輸入完整的 5 碼班級座號（例如 3 年 1 班 5 號請輸入 30105）！";
+        render();
+        return;
+      }
+
+      const rosterEntry = state.rosterList.find(r => r.code === code);
+      if (state.strictRosterOnly && !rosterEntry) {
+        playTone("wrong");
+        state.studentLoginError = `🚫 找不到學號「${code}」，請確認是否輸入錯誤，或請老師在後台新增名單！`;
+        render();
+        return;
+      }
+
+      playTone("correct");
+      state.studentLoginError = "";
+      state.currentStudent = {
+        code,
+        name: rosterEntry ? rosterEntry.name : ""
+      };
+
+      // 嘗試從雲端或本機載入該學生既有學習紀錄
+      let prevData = state.progressMap[code] || null;
+      if (!prevData && window.CloudSync) {
+        prevData = await window.CloudSync.fetchStudentProgressOnce(code);
+      }
+
+      if (prevData) {
+        state.stars = prevData.stars || 0;
+        state.awardedKeys = prevData.awardedKeys || {};
+        state.speakingStarsTotal = prevData.speakingStarsTotal || 0;
+        state.speakingBestStarsByLine = prevData.speakingBestStarsByLine || {};
+        state.completedMissions = prevData.completedMissions || { 1: false, 2: false, 3: false, 4: false };
+        state.missionStars = prevData.missionStars || { 1: 0, 2: 0, 3: 0, 4: 0 };
+        state.introFinished = !!prevData.introFinished;
+      } else {
+        state.stars = 0;
+        state.awardedKeys = {};
+        state.speakingStarsTotal = 0;
+        state.speakingBestStarsByLine = {};
+        state.completedMissions = { 1: false, 2: false, 3: false, 4: false };
+        state.missionStars = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        state.introFinished = false;
+      }
+
+      syncCurrentStudentProgressToCloud();
+      state.screen = "hub";
+      render();
+    }
+
+    function goToHub() {
+      stopActiveRecognition(true);
+      state.speakingRecording = false;
+      state.introRecording = false;
+      playTone("click");
+      state.screen = "hub";
+      render();
+    }
+
+    function openFinalStage() {
+      stopActiveRecognition(true);
+      playTone("click");
+      state.screen = "final";
+      state.introStep = 0;
+      state.introRecording = false;
+      state.introInterimText = "";
+      state.introErrorMsg = "";
+      state.introEvalResult = null;
+      state.introFinished = false;
+      render();
+    }
+
+    function startMission(missionId) {
+      stopActiveRecognition(true);
+      playTone("click");
+      state.currentMission = missionId;
+      state.stepIndex = 0;
+      state.screen = "mission";
+      resetStepTempState();
+      render();
+    }
+
+    function resetStepTempState() {
+      state.questionAnswered = false;
+      state.lastAnswerCorrect = null;
+      state.selectedOptionIdx = null;
+      state.shuffledOptions = null;
+      state.shuffledOptionStepKey = null;
+      state.shuffledRightPairs = null;
+      state.shuffledRightPairsKey = null;
+      state.shuffledDialogueLines = null;
+      state.shuffledDialogueKey = null;
+      state.matchState = { selectedLeft: null, matchedIds: [], errorPair: null };
+      state.boxOpened = false;
+      state.boxItemIndex = 0;
+      state.orderSlots = [null, null, null, null];
+      state.orderChecked = false;
+      state.speakingLineIdx = 0;
+      state.speakingRecording = false;
+      state.speakingInterimText = "";
+      state.speakingErrorMsg = "";
+    }
+
+    // 原本 26 顆遊戲星星加分函式（完全維持原有計分規則）
+    function awardStarOnce(key, missionId) {
+      if (!state.awardedKeys[key]) {
+        state.awardedKeys[key] = true;
+        state.stars += 1;
+        if (missionId) {
+          state.missionStars[missionId] = (state.missionStars[missionId] || 0) + 1;
+        }
+        syncCurrentStudentProgressToCloud();
+      }
+    }
+
+    // 口說練習星星更新（取單句最高星等累加，與原本 26 顆星星分開計算）
+    function recordSpeakingStars(uniqueLineKey, earnedStars) {
+      const prevBest = state.speakingBestStarsByLine[uniqueLineKey] || 0;
+      if (earnedStars > prevBest) {
+        state.speakingBestStarsByLine[uniqueLineKey] = earnedStars;
+        state.speakingStarsTotal += (earnedStars - prevBest);
+        syncCurrentStudentProgressToCloud();
+      }
+    }
+
+    // 口說練習星星更新（取單句最高星等累加，與原本 26 顆星星分開計算）
+    function recordSpeakingStars(uniqueLineKey, earnedStars) {
+      const prevBest = state.speakingBestStarsByLine[uniqueLineKey] || 0;
+      if (earnedStars > prevBest) {
+        state.speakingBestStarsByLine[uniqueLineKey] = earnedStars;
+        state.speakingStarsTotal += (earnedStars - prevBest);
+      }
+    }
+
+    function visitCharacterCard(name, line, gender = "auto") {
+      playTone("click");
+      speakEnglish(line, gender);
+      state.visitedCards[name] = true;
+      render();
+    }
+
+    function visitAgeCard(name, line, gender = "auto") {
+      playTone("click");
+      speakEnglish(line, gender);
+      state.visitedCards["age_" + name] = true;
+      render();
+    }
+
+    function openNextBoxItem() {
+      playTone("correct");
+      if (!state.boxOpened) {
+        state.boxOpened = true;
+      } else {
+        state.boxItemIndex = (state.boxItemIndex + 1) % STATIONERY_LIST.length;
+      }
+      const item = STATIONERY_LIST[state.boxItemIndex];
+      state.visitedCards["box_" + item.key] = true;
+      speakEnglish(item.sentence, "auto");
+      render();
+    }
+
+    function selectMatchLeft(id, text, gender = "auto") {
+      playTone("click");
+      speakEnglish(text, gender);
+      state.matchState.selectedLeft = id;
+      state.matchState.errorPair = null;
+      render();
+    }
+
+    function selectMatchRight(id, text, gender = "auto") {
+      speakEnglish(text, gender);
+      if (!state.matchState.selectedLeft) {
+        playTone("click");
+        return;
+      }
+      if (state.matchState.selectedLeft === id) {
+        playTone("correct");
+        state.matchState.matchedIds.push(id);
+        state.matchState.selectedLeft = null;
+        state.matchState.errorPair = null;
+        const step = MISSIONS[state.currentMission].steps[state.stepIndex];
+        if (state.matchState.matchedIds.length === step.pairs.length) {
+          awardStarOnce(step.id, state.currentMission);
+        }
+      } else {
+        playTone("wrong");
+        state.matchState.errorPair = true;
+        state.matchState.selectedLeft = null;
+      }
+      render();
+    }
+
+    function pickOrderLine(line) {
+      playTone("click");
+      speakEnglish(line, "auto");
+      const emptyIdx = state.orderSlots.findIndex(s => s === null);
+      if (emptyIdx !== -1) {
+        state.orderSlots[emptyIdx] = line;
+        state.orderChecked = false;
+      }
+      render();
+    }
+
+    function removeOrderSlot(idx) {
+      if (state.questionAnswered) return;
+      if (state.orderSlots[idx] !== null) {
+        playTone("click");
+        state.orderSlots[idx] = null;
+        state.orderChecked = false;
+        render();
+      }
+    }
+
+    function clearOrderSlots() {
+      playTone("click");
+      state.orderSlots = [null, null, null, null];
+      state.orderChecked = false;
+      render();
+    }
+
+    function checkOrderDialogue() {
+      const step = MISSIONS[state.currentMission].steps[state.stepIndex];
+      state.orderChecked = true;
+      const isMatch = step.correctLines.every((val, i) => state.orderSlots[i] === val);
+      if (isMatch) {
+        playTone("correct");
+        state.questionAnswered = true;
+        awardStarOnce(step.id, state.currentMission);
+      } else {
+        playTone("wrong");
+      }
+      render();
+    }
+
+    // --------------------------------------------------------------------------
+    // 關卡內口說練習控制 (Speaking Practice Handlers)
+    // --------------------------------------------------------------------------
+    function selectSpeakingLine(idx) {
+      stopActiveRecognition(true);
+      playTone("click");
+      state.speakingLineIdx = idx;
+      state.speakingRecording = false;
+      state.speakingInterimText = "";
+      state.speakingErrorMsg = "";
+      render();
+    }
+
+    function startSpeakingRecord(stepId, lineIdx) {
+      const step = MISSIONS[state.currentMission].steps[state.stepIndex];
+      const targetLine = step.lines[lineIdx];
+      const lineKey = `${stepId}_${lineIdx}`;
+
+      // 每次重新錄音：清除前一次辨識結果、前一次評分、前一次錯誤提示、重設錄音狀態
+      stopActiveRecognition(true);
+      playTone("click");
+      state.speakingRecording = true;
+      state.speakingInterimText = "";
+      state.speakingErrorMsg = "";
+      delete state.speakingResultByLine[lineKey];
+      render();
+
+      beginSpeechSession({
+        targetEn: targetLine.en,
+        onStateChange: (isRec) => {
+          state.speakingRecording = isRec;
+          render();
+        },
+        onInterim: (text) => {
+          state.speakingInterimText = text;
+          render();
+        },
+        onError: (msg) => {
+          state.speakingRecording = false;
+          state.speakingErrorMsg = msg;
+          playTone("wrong");
+          render();
+        },
+        onFinalEvaluated: (evalResult) => {
+          state.speakingRecording = false;
+          state.speakingErrorMsg = "";
+          state.speakingResultByLine[lineKey] = evalResult;
+          recordSpeakingStars(lineKey, evalResult.speakingStars);
+          if (evalResult.finalPercentScore >= 70) {
+            playTone("correct");
+          } else {
+            playTone("click");
+          }
+          render();
+        }
+      });
+    }
+
+    function markSelfPracticeDone(stepId, lineIdx) {
+      playTone("correct");
+      state.speakingSelfPracticed[`${stepId}_${lineIdx}`] = true;
+      render();
+    }
+
+    function completeSpeakingStepAndFinishMission(stepId) {
+      stopActiveRecognition(true);
+      state.speakingRecording = false;
+      // 保留原有每關 1 顆任務星機制（滿分 26 顆維持不變），即使未用麥克風也可順利過關
+      awardStarOnce(stepId, state.currentMission);
+      nextStep();
+    }
+
+    function answerMCQ(displayIdx) {
+      const step = MISSIONS[state.currentMission].steps[state.stepIndex];
+      const chosenObj = state.shuffledOptions ? state.shuffledOptions[displayIdx] : null;
+      const origIdx = chosenObj ? chosenObj.origIdx : displayIdx;
+      state.selectedOptionIdx = displayIdx;
+      let ansGender = step.voiceGender || "auto";
+      if (step.visualType === "mini_chat") ansGender = "male";
+      if (origIdx === step.correctIndex) {
+        playTone("correct");
+        state.questionAnswered = true;
+        state.lastAnswerCorrect = true;
+        awardStarOnce(step.id, state.currentMission);
+        speakEnglish(step.options[step.correctIndex], ansGender);
+      } else {
+        playTone("wrong");
+        state.lastAnswerCorrect = false;
+      }
+      render();
+    }
+
+    function nextStep() {
+      stopActiveRecognition(true);
+      playTone("click");
+      const m = MISSIONS[state.currentMission];
+      if (state.stepIndex < m.steps.length - 1) {
+        state.stepIndex += 1;
+        resetStepTempState();
+        render();
+      } else {
+        playTone("fanfare");
+        state.completedMissions[state.currentMission] = true;
+        syncCurrentStudentProgressToCloud();
+        state.screen = "missionComplete";
+        render();
+      }
+    }
+
+    // --------------------------------------------------------------------------
+    // 最終自我介紹舞台控制 (Final Stage Handlers)
+    // --------------------------------------------------------------------------
+    function setIntroName(val) {
+      state.introName = val;
+      state.introEvalResult = null;
+      state.introErrorMsg = "";
+      if (state.screen === "final") {
+        const speechLines = document.querySelectorAll(".speech-line");
+        if (speechLines.length > 0) {
+          render();
+        }
+      }
+    }
+
+    function setIntroAge(age) {
+      playTone("click");
+      state.introAge = age;
+      state.introEvalResult = null;
+      state.introErrorMsg = "";
+      render();
+    }
+
+    function setIntroItem(item) {
+      playTone("click");
+      state.introItem = item;
+      state.introEvalResult = null;
+      state.introErrorMsg = "";
+      const obj = STATIONERY_LIST.find(s => s.key === item);
+      if (obj) speakEnglish(obj.phrase, "auto");
+      render();
+    }
+
+    function startIntroMicPractice() {
+      const lines = getFinalIntroLines();
+      const showAll = state.introStep >= lines.length;
+      const targetEn = showAll
+        ? lines.map(l => l.en).join(" ")
+        : lines[Math.min(state.introStep, lines.length - 1)].en;
+
+      // 每次重新錄音：完整清除前一次辨識結果、評分與錯誤提示
+      stopActiveRecognition(true);
+      playTone("click");
+      state.introRecording = true;
+      state.introInterimText = "";
+      state.introErrorMsg = "";
+      state.introEvalResult = null;
+      render();
+
+      beginSpeechSession({
+        targetEn,
+        onStateChange: (isRec) => {
+          state.introRecording = isRec;
+          render();
+        },
+        onInterim: (text) => {
+          state.introInterimText = text;
+          render();
+        },
+        onError: (msg) => {
+          state.introRecording = false;
+          state.introErrorMsg = msg;
+          playTone("wrong");
+          render();
+        },
+        onFinalEvaluated: (evalResult) => {
+          state.introRecording = false;
+          state.introErrorMsg = "";
+          state.introEvalResult = evalResult;
+          recordSpeakingStars(`final_intro_${state.introStep}`, evalResult.speakingStars);
+          if (evalResult.finalPercentScore >= 70) {
+            playTone("correct");
+          } else {
+            playTone("click");
+          }
+          render();
+        }
+      });
+    }
+
+    function nextIntroLine() {
+      stopActiveRecognition(true);
+      playTone("correct");
+      state.introRecording = false;
+      state.introInterimText = "";
+      state.introErrorMsg = "";
+      state.introEvalResult = null;
+      state.introStep += 1;
+      render();
+    }
+
+    function restartIntroPractice() {
+      stopActiveRecognition(true);
+      playTone("click");
+      state.introRecording = false;
+      state.introInterimText = "";
+      state.introErrorMsg = "";
+      state.introEvalResult = null;
+      state.introStep = 0;
+      state.introFinished = false;
+      render();
+    }
+
+    function finishAllChallenge() {
+      stopActiveRecognition(true);
+      playTone("fanfare");
+      state.introFinished = true;
+      syncCurrentStudentProgressToCloud();
+      speakEnglish("You're an English Star!", "auto");
+      render();
+    }
+
+    function fullResetGame() {
+      stopActiveRecognition(true);
+      playTone("click");
+      state.screen = "start";
+      state.stars = 0;
+      state.awardedKeys = {};
+      state.speakingStarsTotal = 0;
+      state.speakingBestStarsByLine = {};
+      state.completedMissions = { 1: false, 2: false, 3: false, 4: false };
+      state.missionStars = { 1: 0, 2: 0, 3: 0, 4: 0 };
+      state.visitedCards = {};
+      state.speakingResultByLine = {};
+      state.speakingSelfPracticed = {};
+      state.introStep = 0;
+      state.introRecording = false;
+      state.introInterimText = "";
+      state.introErrorMsg = "";
+      state.introEvalResult = null;
+      state.introFinished = false;
+      resetStepTempState();
+      render();
+    }
+
+    window.onload = function () {
+      loadSystemVoices();
+      initAccessControlFromURL();
+      render();
+    };
+  </script>
+</body>
+</html>
