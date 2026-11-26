@@ -1300,7 +1300,7 @@
         onSnapshot(settingsRef, (snap) => {
           if (snap.exists()) {
             const data = snap.data();
-            if (data.pin) state.teacherPin = data.pin;
+            if (data.pin) state.teacherPin = String(data.pin);
             if (typeof data.strictRoster === "boolean") state.strictRosterOnly = data.strictRoster;
             saveTeacherLocalBackup();
             if (state.showTeacherModal) renderTeacherModal();
@@ -1333,8 +1333,38 @@
       saveTeacherSettings: async function (pin, strictRoster) {
         if (!this.ready || !this.user || !this.db) return false;
         const settingsRef = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "teacherConfig");
-        await setDoc(settingsRef, { pin, strictRoster, updatedAt: Date.now() }, { merge: true });
+        await setDoc(settingsRef, { pin: String(pin), strictRoster, updatedAt: Date.now() }, { merge: true });
         return true;
+      },
+      fetchTeacherSettingsOnce: async function () {
+        if (!this.ready || !this.user || !this.db) return null;
+        try {
+          const settingsRef = doc(this.db, "artifacts", this.appId, "public", "data", "settings", "teacherConfig");
+          const snap = await getDoc(settingsRef);
+          if (snap.exists()) {
+            const data = snap.data();
+            if (data.pin) state.teacherPin = String(data.pin);
+            if (typeof data.strictRoster === "boolean") state.strictRosterOnly = data.strictRoster;
+            saveTeacherLocalBackup();
+            return data;
+          }
+          return null;
+        } catch (e) {
+          return null;
+        }
+      },
+      resetAllStudentProgressInCloud: async function (codesList) {
+        if (!this.ready || !this.user || !this.db) return false;
+        try {
+          for (const code of codesList) {
+            const ref = doc(this.db, "artifacts", this.appId, "public", "data", "studentProgress", code);
+            await deleteDoc(ref);
+          }
+          return true;
+        } catch (e) {
+          console.warn(e);
+          return false;
+        }
       },
       upsertStudentRoster: async function (code, name) {
         if (!this.ready || !this.user || !this.db) return;
@@ -2191,14 +2221,17 @@
     const state = {
       screen: "locked", // locked | start | hub | mission | missionComplete | final | expired
       avatar: "fox",
+      isStudentSession: false, // 透過課堂 QR Code 掃描進入的學生模式，隱藏教師管理入口
       // 門禁與課堂限時存取控制 (預設鎖定，需掃描教師產生的限時 QR Code 才解鎖)
       accessExpiresAt: null,
       teacherPin: "1234",
+      teacherPinLoading: false,
       teacherUnlocked: false,
       teacherPinInput: "",
       teacherPinError: "",
-      teacherModalTab: "qr", // qr | roster | settings
+      teacherModalTab: "qr", // qr | roster | analytics | settings
       showTeacherModal: false,
+      confirmResetAllProgress: false,
       teacherBaseUrl: "",
       teacherDurationMin: 45,
       teacherSingleUse: true,
@@ -2219,6 +2252,7 @@
       // 原本 26 顆遊戲星星（完全保留原有計分邏輯）
       stars: 0,
       awardedKeys: {},
+      wrongCounts: {}, // 單題答錯次數累計（供教師後台錯誤率統計）
       // 額外口說練習星星（與原本 26 顆遊戲星星分開計算）
       speakingStarsTotal: 0,
       speakingBestStarsByLine: {},
@@ -2776,6 +2810,16 @@
       document.getElementById("speakingStarCounter").textContent = `🎙️ 口說星：${state.speakingStarsTotal}`;
       const hubBtn = document.getElementById("btnHubNav");
       const studentPill = document.getElementById("studentBadgePill");
+      const teacherBtn = document.getElementById("btnTeacherQR");
+
+      // 安全性修復：學生透過 QR Code 進入或已登入學生座號時，隱藏頂部「教師管理」按鈕
+      if (teacherBtn) {
+        if (state.isStudentSession || state.currentStudent) {
+          teacherBtn.classList.add("hidden");
+        } else {
+          teacherBtn.classList.remove("hidden");
+        }
+      }
 
       if (state.currentStudent && state.screen !== "locked" && state.screen !== "expired") {
         studentPill.classList.remove("hidden");
@@ -2905,6 +2949,7 @@
         return;
       }
 
+      state.isStudentSession = true;
       state.accessExpiresAt = expMs;
       state.screen = "start";
       startClassCountdownTimer();
@@ -2928,42 +2973,41 @@
     }
 
     function updateClassTimerUI() {
-      const pill = document.getElementById("classTimerPill");
-      if (!pill) return;
-      if (!state.accessExpiresAt || state.screen === "locked" || state.screen === "expired") {
-        pill.classList.add("hidden");
-        return;
-      }
-      pill.classList.remove("hidden");
-      const remainSec = Math.max(0, Math.floor((state.accessExpiresAt - Date.now()) / 1000));
-      const mins = String(Math.floor(remainSec / 60)).padStart(2, "0");
-      const secs = String(remainSec % 60).padStart(2, "0");
-      pill.textContent = `⏳ 剩餘 ${mins}:${secs}`;
-      if (remainSec <= 180) {
-        pill.className = "timer-pill warning";
-      } else {
-        pill.className = "timer-pill";
-      }
-    }
-
-    function openTeacherModal() {
+    async function openTeacherModal() {
+      // 若為學生端模式，禁止開啟教師管理彈窗
+      if (state.isStudentSession || state.currentStudent) return;
       playTone("click");
       state.showTeacherModal = true;
       state.teacherPinError = "";
       state.teacherCopiedMsg = false;
+      state.confirmResetAllProgress = false;
       generateTimedQRUrl();
+      if (!state.teacherUnlocked && window.CloudSync) {
+        state.teacherPinLoading = true;
+        renderTeacherModal();
+        await window.CloudSync.fetchTeacherSettingsOnce();
+        state.teacherPinLoading = false;
+      }
       renderTeacherModal();
     }
 
     function closeTeacherModal() {
       playTone("click");
       state.showTeacherModal = false;
+      state.confirmResetAllProgress = false;
       renderTeacherModal();
     }
 
-    function verifyTeacherPin() {
+    async function verifyTeacherPin() {
       const entered = (state.teacherPinInput || "").trim();
-      if (entered === state.teacherPin) {
+      if (!entered) return;
+      if (window.CloudSync && window.CloudSync.ready) {
+        state.teacherPinLoading = true;
+        renderTeacherModal();
+        await window.CloudSync.fetchTeacherSettingsOnce();
+        state.teacherPinLoading = false;
+      }
+      if (entered === String(state.teacherPin)) {
         playTone("correct");
         state.teacherUnlocked = true;
         state.teacherPinError = "";
@@ -2971,13 +3015,14 @@
         generateTimedQRUrl();
       } else {
         playTone("wrong");
-        state.teacherPinError = "❌ 密碼錯誤，請重新輸入教師密碼（預設為 1234）";
+        state.teacherPinError = "❌ 密碼錯誤，請重新輸入教師密碼";
       }
       renderTeacherModal();
     }
 
     function unlockPreviewForTeacherTest() {
       playTone("correct");
+      state.isStudentSession = false;
       state.accessExpiresAt = Date.now() + 60 * 60 * 1000;
       state.showTeacherModal = false;
       state.screen = "start";
@@ -3241,6 +3286,7 @@
         avatar: state.avatar,
         stars: state.stars,
         awardedKeys: state.awardedKeys,
+        wrongCounts: state.wrongCounts,
         speakingStarsTotal: state.speakingStarsTotal,
         speakingBestStarsByLine: state.speakingBestStarsByLine,
         completedMissions: state.completedMissions,
@@ -3253,6 +3299,45 @@
       if (window.CloudSync) {
         window.CloudSync.saveStudentProgress(payload);
       }
+    }
+
+    // 紀錄單題答錯次數（供教師後台錯誤率分析）
+    function recordQuestionWrongAttempt(questionId) {
+      if (!questionId) return;
+      state.wrongCounts[questionId] = (state.wrongCounts[questionId] || 0) + 1;
+      syncCurrentStudentProgressToCloud();
+    }
+
+    // 一鍵重置全班學習進度（保留班級名單與密碼設定，清空所有學生星星與作答紀錄）
+    async function executeResetAllClassProgress() {
+      playTone("click");
+      const allCodes = Object.keys(state.progressMap);
+      state.progressMap = {};
+      state.confirmResetAllProgress = false;
+      saveTeacherLocalBackup();
+      if (window.CloudSync && window.CloudSync.ready && allCodes.length > 0) {
+        await window.CloudSync.resetAllStudentProgressInCloud(allCodes);
+      }
+      state.rosterNoticeMsg = "✅ 已一鍵重置全班學習進度（班級名單與教師密碼已完整保留）！";
+      renderTeacherModal();
+    }
+
+    // 取得題目中文與英文對照表（供單題錯誤率統計顯示）
+    function getQuestionMetaMap() {
+      const map = {};
+      [1, 2, 3, 4].forEach(mId => {
+        const m = MISSIONS[mId];
+        m.steps.forEach((step, idx) => {
+          if (step.id && step.type !== "speaking_practice") {
+            map[step.id] = {
+              id: step.id,
+              missionId: mId,
+              label: `Mission ${mId} - ${step.promptEn || step.badge}`
+            };
+          }
+        });
+      });
+      return map;
     }
 
     function renderTeacherModal() {
@@ -3273,8 +3358,13 @@
                 <button class="nav-btn" style="min-height:36px; padding:4px 12px;" onclick="closeTeacherModal()">✕</button>
               </div>
               <p style="font-size:0.95rem; color:var(--text-muted); font-weight:700; margin:12px 0;">
-                請輸入教師管理密碼以派發課堂 QR Code、建立班級學生名單或檢視全班學習紀錄（預設密碼：<code>1234</code>）：
+                請輸入教師管理密碼以派發課堂 QR Code、建立班級學生名單或檢視全班學習紀錄：
               </p>
+              ${state.teacherPinLoading ? `
+                <div style="font-size:0.88rem; font-weight:800; color:var(--blue-dark); margin-bottom:10px;">
+                  ⏳ 正在與雲端同步最新教師密碼...
+                </div>
+              ` : ""}
               <input type="password" value="${state.teacherPinInput}"
                 placeholder="請輸入教師密碼"
                 oninput="state.teacherPinInput=this.value"
@@ -3282,7 +3372,7 @@
                 style="width:200px; padding:10px 14px; border:3px solid var(--blue-main); border-radius:14px; font-size:1.25rem; font-weight:900; text-align:center;" />
               ${state.teacherPinError ? `<div class="feedback-box error-alert" style="margin-top:10px;">${state.teacherPinError}</div>` : ""}
               <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
-                <button class="btn btn-primary" onclick="verifyTeacherPin()">🔓 解鎖進入後台</button>
+                <button class="btn btn-primary" ${state.teacherPinLoading ? "disabled" : ""} onclick="verifyTeacherPin()">🔓 解鎖進入後台</button>
               </div>
             </div>
           </div>
@@ -3461,6 +3551,163 @@
             </div>
           </div>
         `;
+      } else if (state.teacherModalTab === "analytics") {
+        // 1. 計算全班排行榜（依總星星數：遊戲星 + 口說星排序）
+        const rankingList = filteredCodes.map(code => {
+          const rItem = state.rosterList.find(r => r.code === code);
+          const prog = state.progressMap[code] || {};
+          const name = prog.name || (rItem ? rItem.name : "");
+          const gameStars = prog.stars || 0;
+          const spStars = prog.speakingStarsTotal || 0;
+          return {
+            code,
+            name,
+            gameStars,
+            spStars,
+            totalStars: gameStars + spStars,
+            hasStarted: !!prog.updatedAt
+          };
+        }).sort((a, b) => b.totalStars - a.totalStars || b.gameStars - a.gameStars || a.code.localeCompare(b.code));
+
+        // 2. 計算各題答錯率統計
+        const qMetaMap = getQuestionMetaMap();
+        const qStatsList = Object.values(qMetaMap).map(q => {
+          let attemptedStudents = 0;
+          let studentsWhoErrored = 0;
+          let totalWrongClicks = 0;
+
+          filteredCodes.forEach(code => {
+            const prog = state.progressMap[code];
+            if (!prog) return;
+            const passed = !!(prog.awardedKeys && prog.awardedKeys[q.id]);
+            const wrongs = (prog.wrongCounts && prog.wrongCounts[q.id]) || 0;
+            if (passed || wrongs > 0) {
+              attemptedStudents += 1;
+              if (wrongs > 0) {
+                studentsWhoErrored += 1;
+                totalWrongClicks += wrongs;
+              }
+            }
+          });
+
+          const errorRate = attemptedStudents > 0
+            ? Math.round((studentsWhoErrored / attemptedStudents) * 100)
+            : 0;
+
+          return {
+            ...q,
+            attemptedStudents,
+            studentsWhoErrored,
+            totalWrongClicks,
+            errorRate
+          };
+        }).sort((a, b) => b.errorRate - a.errorRate || b.totalWrongClicks - a.totalWrongClicks);
+
+        tabBodyHtml = `
+          <div style="text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:800; color:var(--blue-dark);">篩選班級：</span>
+                <select onchange="state.rosterFilterClass=this.value; renderTeacherModal();"
+                  style="padding:5px 10px; border:2px solid var(--blue-main); border-radius:999px; font-weight:800; font-size:0.88rem;">
+                  <option value="ALL" ${state.rosterFilterClass === "ALL" ? "selected" : ""}>全部班級</option>
+                  ${classList.map(c => `<option value="${c}" ${state.rosterFilterClass === c ? "selected" : ""}>${c} 班</option>`).join("")}
+                </select>
+              </div>
+              <button class="btn btn-red" style="min-height:38px; padding:5px 14px; font-size:0.86rem;"
+                onclick="state.confirmResetAllProgress=true; renderTeacherModal();">
+                🗑️ 一鍵重置全班進度
+              </button>
+            </div>
+
+            ${state.confirmResetAllProgress ? `
+              <div class="feedback-box error-alert" style="margin-bottom:12px;">
+                <div style="font-weight:900; margin-bottom:6px;">⚠️ 確定要清空所有學生的星星與闖關進度嗎？</div>
+                <div style="font-size:0.88rem; margin-bottom:10px;">此動作會清除雲端與本機的所有學生作答紀錄（但會保留班級名單與教師密碼），清除後無法復原！</div>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn btn-red" style="min-height:38px; padding:6px 14px; font-size:0.88rem;" onclick="executeResetAllClassProgress()">
+                    ✅ 確定全部重置
+                  </button>
+                  <button class="btn btn-outline" style="min-height:38px; padding:6px 14px; font-size:0.88rem;" onclick="state.confirmResetAllProgress=false; renderTeacherModal();">
+                    取消
+                  </button>
+                </div>
+              </div>
+            ` : ""}
+
+            ${state.rosterNoticeMsg ? `<div class="feedback-box success" style="margin-bottom:12px;">${state.rosterNoticeMsg}</div>` : ""}
+
+            <!-- 🏆 全班星星排行榜 -->
+            <div style="background:#fffdf5; border:2px solid var(--yellow-main); border-radius:16px; padding:12px; margin-bottom:14px;">
+              <h4 style="margin:0 0 8px; color:#7c5300; font-size:1.02rem;">🏆 全班星星排行榜（遊戲星 ＋ 口說星）</h4>
+              <div class="roster-table-wrap" style="margin-top:0; max-height:210px; overflow-y:auto;">
+                <table class="roster-table">
+                  <thead>
+                    <tr>
+                      <th>名次</th>
+                      <th>學號 / 姓名</th>
+                      <th>遊戲星</th>
+                      <th>口說星</th>
+                      <th>總星星數</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rankingList.length === 0 ? `
+                      <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:12px;">尚無學生資料</td></tr>
+                    ` : rankingList.map((st, idx) => {
+                      const medal = idx === 0 && st.totalStars > 0 ? "🥇" : idx === 1 && st.totalStars > 0 ? "🥈" : idx === 2 && st.totalStars > 0 ? "🥉" : `#${idx + 1}`;
+                      return `
+                        <tr>
+                          <td style="font-weight:900;">${medal}</td>
+                          <td>${st.code} ${st.name ? `<strong>${st.name}</strong>` : ""}</td>
+                          <td>⭐ ${st.gameStars}</td>
+                          <td>🎙️ ${st.spStars}</td>
+                          <td style="color:var(--pink-dark); font-weight:900;">🌟 ${st.totalStars} 顆</td>
+                        </tr>
+                      `;
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 📉 單題錯誤率統計 -->
+            <div style="background:#f6faff; border:2px solid #cbe0fa; border-radius:16px; padding:12px;">
+              <h4 style="margin:0 0 4px; color:var(--blue-dark); font-size:1.02rem;">📉 單題答錯率統計（由高到低排序）</h4>
+              <div style="font-size:0.82rem; color:var(--text-muted); font-weight:700; margin-bottom:8px;">
+                方便老師快速掌握全班最容易混淆的文法或單字題目（例如 an eraser 或 this / that）：
+              </div>
+              <div class="roster-table-wrap" style="margin-top:0; max-height:230px; overflow-y:auto;">
+                <table class="roster-table">
+                  <thead>
+                    <tr>
+                      <th>關卡與題目內容</th>
+                      <th>作答人數</th>
+                      <th>答錯人數</th>
+                      <th>答錯率</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${qStatsList.map(q => `
+                      <tr>
+                        <td style="font-size:0.85rem;">${q.label}</td>
+                        <td>${q.attemptedStudents} 人</td>
+                        <td>${q.studentsWhoErrored} 人（共錯 ${q.totalWrongClicks} 次）</td>
+                        <td>
+                          <span style="display:inline-block; padding:2px 8px; border-radius:999px; font-weight:900; font-size:0.82rem;
+                            background:${q.errorRate >= 40 ? 'var(--pink-soft)' : q.errorRate > 0 ? 'var(--yellow-soft)' : 'var(--mint-soft)'};
+                            color:${q.errorRate >= 40 ? 'var(--pink-dark)' : q.errorRate > 0 ? '#7c5300' : '#135740'};">
+                            ${q.errorRate}%
+                          </span>
+                        </td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
       } else {
         const syncStatus = window.CloudSync ? window.CloudSync.statusText : "🟡 單機模式";
         const savedFbObj = window.CloudSync ? window.CloudSync.getSavedCustomConfig() : null;
@@ -3527,10 +3774,13 @@
                 📱 1. 派發課堂限時 QR
               </button>
               <button class="modal-tab-btn ${state.teacherModalTab === "roster" ? "active" : ""}" onclick="setTeacherModalTab('roster')">
-                📋 2. 班級名單與學習紀錄
+                📋 2. 班級名單與紀錄
+              </button>
+              <button class="modal-tab-btn ${state.teacherModalTab === "analytics" ? "active" : ""}" onclick="setTeacherModalTab('analytics')">
+                📊 3. 排行榜與錯題統計
               </button>
               <button class="modal-tab-btn ${state.teacherModalTab === "settings" ? "active" : ""}" onclick="setTeacherModalTab('settings')">
-                ⚙️ 3. 雲端同步與密碼設定
+                ⚙️ 4. 雲端與密碼設定
               </button>
             </div>
 
@@ -4707,6 +4957,7 @@
       if (prevData) {
         state.stars = prevData.stars || 0;
         state.awardedKeys = prevData.awardedKeys || {};
+        state.wrongCounts = prevData.wrongCounts || {};
         state.speakingStarsTotal = prevData.speakingStarsTotal || 0;
         state.speakingBestStarsByLine = prevData.speakingBestStarsByLine || {};
         state.completedMissions = prevData.completedMissions || { 1: false, 2: false, 3: false, 4: false };
@@ -4715,6 +4966,7 @@
       } else {
         state.stars = 0;
         state.awardedKeys = {};
+        state.wrongCounts = {};
         state.speakingStarsTotal = 0;
         state.speakingBestStarsByLine = {};
         state.completedMissions = { 1: false, 2: false, 3: false, 4: false };
@@ -4865,6 +5117,8 @@
         playTone("wrong");
         state.matchState.errorPair = true;
         state.matchState.selectedLeft = null;
+        const step = MISSIONS[state.currentMission].steps[state.stepIndex];
+        recordQuestionWrongAttempt(step.id);
       }
       render();
     }
@@ -4907,6 +5161,7 @@
         awardStarOnce(step.id, state.currentMission);
       } else {
         playTone("wrong");
+        recordQuestionWrongAttempt(step.id);
       }
       render();
     }
@@ -4999,6 +5254,7 @@
       } else {
         playTone("wrong");
         state.lastAnswerCorrect = false;
+        recordQuestionWrongAttempt(step.id);
       }
       render();
     }
@@ -5138,6 +5394,7 @@
       state.screen = "start";
       state.stars = 0;
       state.awardedKeys = {};
+      state.wrongCounts = {};
       state.speakingStarsTotal = 0;
       state.speakingBestStarsByLine = {};
       state.completedMissions = { 1: false, 2: false, 3: false, 4: false };
