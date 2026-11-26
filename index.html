@@ -1210,7 +1210,7 @@
             }
           });
         } catch (e) {
-          console.warn("CloudSync fallback to memory:", e);
+          console.warn("CloudSync fallback to localStorage:", e);
         }
       },
       subscribeAll: function () {
@@ -1223,6 +1223,7 @@
             const data = snap.data();
             if (data.pin) state.teacherPin = data.pin;
             if (typeof data.strictRoster === "boolean") state.strictRosterOnly = data.strictRoster;
+            saveTeacherLocalBackup();
             if (state.showTeacherModal) renderTeacherModal();
           }
         }, (err) => console.warn(err));
@@ -1234,6 +1235,7 @@
           snap.forEach((d) => list.push(d.data()));
           list.sort((a, b) => String(a.code).localeCompare(String(b.code)));
           state.rosterList = list;
+          saveTeacherLocalBackup();
           if (state.showTeacherModal) renderTeacherModal();
         }, (err) => console.warn(err));
 
@@ -1245,6 +1247,7 @@
             map[d.id] = d.data();
           });
           state.progressMap = map;
+          saveTeacherLocalBackup();
           if (state.showTeacherModal) renderTeacherModal();
         }, (err) => console.warn(err));
       },
@@ -2721,10 +2724,51 @@
     // --------------------------------------------------------------------------
     // 預設門禁鎖定 ＋ 課堂限時 QR Code 入口產生器 ＋ 班級名單與成績系統
     // --------------------------------------------------------------------------
+    const LOCAL_STORAGE_KEY = "stationery_detective_teacher_data_v1";
+
+    function saveTeacherLocalBackup() {
+      try {
+        const data = {
+          teacherPin: state.teacherPin,
+          strictRosterOnly: state.strictRosterOnly,
+          rosterList: state.rosterList,
+          progressMap: state.progressMap
+        };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        // 忽略無痕模式或受限 iframe 的儲存錯誤
+      }
+    }
+
+    function loadTeacherLocalBackup() {
+      try {
+        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data && typeof data === "object") {
+          if (typeof data.teacherPin === "string" && data.teacherPin.length >= 4) {
+            state.teacherPin = data.teacherPin;
+          }
+          if (typeof data.strictRosterOnly === "boolean") {
+            state.strictRosterOnly = data.strictRosterOnly;
+          }
+          if (Array.isArray(data.rosterList)) {
+            state.rosterList = data.rosterList;
+          }
+          if (data.progressMap && typeof data.progressMap === "object") {
+            state.progressMap = data.progressMap;
+          }
+        }
+      } catch (e) {
+        // 忽略讀取錯誤
+      }
+    }
+
     let classTimerInterval = null;
     const usedSessionTokens = new Set();
 
     function initAccessControlFromURL() {
+      loadTeacherLocalBackup();
       const params = new URLSearchParams(window.location.search);
       const expParam = params.get("exp");
       const tokenParam = params.get("tid");
@@ -2934,6 +2978,7 @@
       state.newStudentCode = "";
       state.newStudentName = "";
       state.rosterNoticeMsg = `✅ 已新增／更新學生：${code} ${name}`;
+      saveTeacherLocalBackup();
       if (window.CloudSync) {
         await window.CloudSync.upsertStudentRoster(code, name);
       }
@@ -2969,6 +3014,7 @@
         playTone("correct");
         state.bulkRosterText = "";
         state.rosterNoticeMsg = `✅ 成功匯入 ${addedCount} 筆學生資料！`;
+        saveTeacherLocalBackup();
       } else {
         playTone("wrong");
         state.rosterNoticeMsg = "⚠️ 找不到符合格式的資料，請確認每行開頭為 5 碼數字（例如：30101 王小明）";
@@ -2979,6 +3025,7 @@
     async function deleteStudentFromRoster(code) {
       playTone("click");
       state.rosterList = state.rosterList.filter(s => s.code !== code);
+      saveTeacherLocalBackup();
       if (window.CloudSync) {
         await window.CloudSync.removeStudentRoster(code);
       }
@@ -3001,6 +3048,7 @@
       state.teacherPin = newPin;
       state.strictRosterOnly = strictVal;
       state.rosterNoticeMsg = "✅ 已儲存教師密碼與名單驗證設定！";
+      saveTeacherLocalBackup();
       if (window.CloudSync) {
         await window.CloudSync.saveTeacherSettings(newPin, strictVal);
       }
@@ -3075,6 +3123,7 @@
         updatedAt: Date.now()
       };
       state.progressMap[code] = payload;
+      saveTeacherLocalBackup();
       if (window.CloudSync) {
         window.CloudSync.saveStudentProgress(payload);
       }
