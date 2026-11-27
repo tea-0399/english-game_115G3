@@ -1183,14 +1183,7 @@
     import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const CUSTOM_FB_STORAGE_KEY = "stationery_detective_custom_fb_config_v1";
-    const DEFAULT_BUILTIN_FB_CONFIG = {
-      apiKey: "AIzaSyAWlpwBUE8FixscZxTGcVAC0t6998uj1Ik",
-      authDomain: "english-practice115.firebaseapp.com",
-      projectId: "english-practice115",
-      storageBucket: "english-practice115.firebasestorage.app",
-      messagingSenderId: "148682840529",
-      appId: "1:148682840529:web:93ddc39b9f185d87a968f0"
-    };
+    const DEFAULT_BUILTIN_FB_CONFIG = null;
 
     window.CloudSync = {
       ready: false,
@@ -1248,12 +1241,12 @@
           if (!firebaseConfig) {
             firebaseConfig = this.getSavedCustomConfig();
           }
-          if (!firebaseConfig && typeof DEFAULT_BUILTIN_FB_CONFIG !== "undefined") {
+          if (!firebaseConfig && DEFAULT_BUILTIN_FB_CONFIG) {
             firebaseConfig = DEFAULT_BUILTIN_FB_CONFIG;
           }
           if (!firebaseConfig) {
             this.ready = false;
-            this.statusText = "🟡 僅限單機儲存（上傳至 GitHub 後，請至「3. 雲端同步與密碼設定」貼上 Firebase 設定即可跨手機同步）";
+            this.statusText = "🟡 僅限單機儲存（請至教師後台「4. 密碼與雲端設定」貼上 Firebase 設定即可跨手機同步）";
             if (window.state && window.state.showTeacherModal && typeof window.renderTeacherModal === "function") window.renderTeacherModal();
             return;
           }
